@@ -89,7 +89,7 @@ El hover de la galería mantiene una altura fija por panel y anima únicamente e
 
 ## Visualizador de pista y audio demo
 
-La página individual de pista (`/tracks/:id`) usa un canvas negro de 56 barras simétricas conectado al `AnalyserNode` del mismo reproductor persistente. El MP3 de demostración se reutiliza para todas las pistas del catálogo local. Dentro de la pista la barra global se oculta y el control aparece junto al visualizador; al salir de la ruta vuelve la barra inferior. El botón `Cerrar reproductor` pausa y retira la barra cuando el usuario lo solicita.
+La página individual de pista (`/tracks/:id`) usa un canvas negro de 56 barras simétricas conectado al `AnalyserNode` del mismo reproductor persistente. Cada pista usa su archivo demo cuando está definido y el MP3 CC0 queda como fallback. Dentro de la pista la barra global se oculta y el control aparece junto al visualizador; al salir de la ruta vuelve la barra inferior. El botón `Cerrar reproductor` pausa y retira la barra cuando el usuario lo solicita.
 
 El archivo local `public/audio/nighttime-solitude-cc0.mp3` es “Nighttime Solitude”, de celestialghost8, descargado desde OpenGameArt bajo CC0. La fuente y la licencia están documentadas en `public/audio/README.md`; sigue como fallback para las pistas demo ficticias. Los demos completos de 8Batzz, Esteban Arenas y Alankoll están en `public/audio/demos/` y se reproducen solo en sus pistas de catálogo.
 
@@ -97,9 +97,9 @@ El archivo local `public/audio/nighttime-solitude-cc0.mp3` es “Nighttime Solit
 
 El catálogo local mezcla fichas de artistas demo con tres demos originales suministrados para Abrakadabra Music: “Lose Control” de 8Batzz, “Arkana” de 8Batzz, Esteban Arenas y Alankoll, e “IDxx” de Esteban Arenas y 8Batzz. Las tres pistas aparecen en Artistas, Lanzamientos y Pistas, usan archivos de audio propios y están marcadas como solo demo, sin precio de compra. La imagen de portada permanece como arte genérico del catálogo hasta recibir portadas aprobadas.
 
-Recursos que deben sustituirse antes de una publicación: fotografía protagonista autorizada de cada artista, fotografías de historia/galería, los tres retratos editoriales demo añadidos en esta iteración, portadas finales y banners aprobados, demos de audio autorizados y sus peaks/waveforms. La UI marca explícitamente que el archivo visual de Lua Mar está pendiente. No se descargaron imágenes ni audios del referente.
+Recursos que deben sustituirse antes de una publicación: fotografía protagonista autorizada de cada artista, fotografías de historia/galería, los tres retratos editoriales demo añadidos en esta iteración, portadas finales y banners aprobados, y demos autorizados para las pistas que aún usan el audio CC0 de fallback junto con sus peaks/waveforms. La UI marca explícitamente que el archivo visual de Lua Mar está pendiente. No se descargaron imágenes ni audios del referente.
 
-Faltan para una siguiente fase: portadas autorizadas cuadradas (mínimo 1600×1600), retratos editoriales autorizados (3:4, mínimo 1200×1600), banner/hero autorizado (16:9), previews recortados autorizados por pista y peaks/waveforms correspondientes. No se descargaron imágenes ni audios de las referencias comerciales.
+Faltan para una siguiente fase: portadas autorizadas cuadradas (mínimo 1600×1600), retratos editoriales autorizados (3:4, mínimo 1200×1600), banner/hero autorizado (16:9), previews recortados para las pistas demo restantes y peaks/waveforms correspondientes. No se descargaron imágenes ni audios de las referencias comerciales.
 
 ## Pendientes de backend
 
