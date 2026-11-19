@@ -33,6 +33,7 @@ type MusicContextValue = {
   audioError: string | null;
   audioAnalyser: AnalyserNode | null;
   playTrack: (track: Track) => void;
+  seekTo: (time: number) => void;
   togglePlayback: () => void;
   dismissPlayer: () => void;
   cart: CartLine[];
@@ -175,6 +176,13 @@ export function MusicProvider({ children }: { children: ReactNode }) {
     if (activeTrack?.id === track.id) { togglePlayback(); return; }
     pendingPlay.current = true; setActiveTrack(track);
   };
+  const seekTo = (time: number) => {
+    const audio = audioRef.current;
+    if (!audio || !Number.isFinite(audio.duration) || audio.duration <= 0 || !Number.isFinite(time)) return;
+    const nextTime = Math.max(0, Math.min(time, audio.duration));
+    audio.currentTime = nextTime;
+    setProgress(nextTime);
+  };
   const togglePlayback = () => {
     const audio = audioRef.current;
     if (!audio || !activeTrack) return;
@@ -216,7 +224,7 @@ export function MusicProvider({ children }: { children: ReactNode }) {
     setDemoUser(false);
   };
 
-  return <MusicContext.Provider value={{ catalog, catalogLoading, musicUser, authLoading, loginMusicUser, registerMusicUser, logoutMusicUser, activeTrack, isPlaying, progress, duration, audioError, audioAnalyser, playTrack, togglePlayback, dismissPlayer, cart, cartOpen, setCartOpen, addToCart, removeFromCart, cartNotice, favorites, toggleFavorite, demoUser, setDemoUser }}>{children}</MusicContext.Provider>;
+  return <MusicContext.Provider value={{ catalog, catalogLoading, musicUser, authLoading, loginMusicUser, registerMusicUser, logoutMusicUser, activeTrack, isPlaying, progress, duration, audioError, audioAnalyser, playTrack, seekTo, togglePlayback, dismissPlayer, cart, cartOpen, setCartOpen, addToCart, removeFromCart, cartNotice, favorites, toggleFavorite, demoUser, setDemoUser }}>{children}</MusicContext.Provider>;
 }
 
 function Logo() {
@@ -294,10 +302,10 @@ function TrackRow({ track, index }: { track: Track; index: number }) {
 }
 
 export function PlayerBar() {
-  const { activeTrack, isPlaying, progress, duration, togglePlayback, dismissPlayer, audioError, setCartOpen, addToCart, catalog } = useMusic();
+  const { activeTrack, isPlaying, progress, duration, seekTo, togglePlayback, dismissPlayer, audioError, setCartOpen, addToCart, catalog } = useMusic();
   if (!activeTrack) return null;
   const ratio = duration ? Math.min(100, (progress / duration) * 100) : 0;
-  return <aside className="player-bar" aria-label="Reproductor de demos"><button className="player-close" type="button" onClick={dismissPlayer} aria-label="Cerrar reproductor"><X size={17} /></button><div className="player-art"><img src={activeTrack.cover} alt="" /></div><div className="player-track"><strong>{activeTrack.title}</strong><span>{artistName(activeTrack.artistIds, catalog.artists)} · demo</span></div><PlayButton track={activeTrack} large /><div className="player-progress"><div className="progress-line"><span style={{ width: `${ratio}%` }} /></div><div><span>{formatTime(progress)}</span><span>preview · {formatTime(duration)}</span></div></div>{!activeTrack.demoOnly && <button className="player-buy" onClick={() => addToCart(trackOffer(activeTrack, catalog.artists))}><ShoppingBag size={16} /> <span>Comprar</span></button>}<button className="player-queue" onClick={() => setCartOpen(true)} aria-label="Abrir cola y carrito"><Library size={17} /></button>{audioError && <span className="sr-only" role="status">{audioError}</span>}</aside>;
+  return <aside className="player-bar" aria-label="Reproductor de demos"><button className="player-close" type="button" onClick={dismissPlayer} aria-label="Cerrar reproductor"><X size={17} /></button><div className="player-art"><img src={activeTrack.cover} alt="" /></div><div className="player-track"><strong>{activeTrack.title}</strong><span>{artistName(activeTrack.artistIds, catalog.artists)} · demo</span></div><PlayButton track={activeTrack} large /><div className="player-progress"><input className="seek-slider" type="range" min={0} max={Math.max(1, duration)} step={1} value={Math.min(progress, duration)} style={{ '--seek-progress': `${ratio}%` } as React.CSSProperties} onChange={(event) => seekTo(Number(event.currentTarget.value))} aria-label={`Buscar posición en ${activeTrack.title}`} aria-valuetext={`${formatTime(progress)} de ${formatTime(duration)}`} /><div className="player-time"><span>{formatTime(progress)}</span><span>{formatTime(duration)}</span></div></div>{!activeTrack.demoOnly && <button className="player-buy" onClick={() => addToCart(trackOffer(activeTrack, catalog.artists))}><ShoppingBag size={16} /> <span>Comprar</span></button>}<button className="player-queue" onClick={() => setCartOpen(true)} aria-label="Abrir cola y carrito"><Library size={17} /></button>{audioError && <span className="sr-only" role="status">{audioError}</span>}</aside>;
 }
 
 function formatTime(value: number) { const totalSeconds = Math.max(0, Math.floor(value)); return `${Math.floor(totalSeconds / 60)}:${(totalSeconds % 60).toString().padStart(2, '0')}`; }
@@ -462,7 +470,7 @@ function ReleasePage({ id }: { id: string }) {
 }
 
 function TrackPage({ id }: { id: string }) {
-  const { catalog, activeTrack, isPlaying, audioAnalyser, progress, duration, playTrack, togglePlayback } = useMusic();
+  const { catalog, activeTrack, isPlaying, audioAnalyser, progress, duration, playTrack, seekTo, togglePlayback } = useMusic();
   const track = catalog.tracks.find((item) => item.id === id) || catalog.tracks[0];
   const release = track ? catalog.releases.find((item) => item.id === track.releaseId) : undefined;
   if (!track) return <PageFrame eyebrow="04 / Pistas" title="Sin pistas" intro="Todavía no hay contenido publicado."><EmptySearch label="El catálogo está esperando su primera pista." /></PageFrame>;
@@ -471,7 +479,7 @@ function TrackPage({ id }: { id: string }) {
   return <div className="track-page-shell"><div className="track-page container">
     <div className="track-page-intro"><p className="eyebrow">Pista / Grabación</p><h1>{track.title}</h1><p>{track.version ? `${track.version} · ${artistName(track.artistIds, catalog.artists)}` : artistName(track.artistIds, catalog.artists)}</p></div>
     <div className="track-detail track-page-detail"><div className="track-detail-art"><img src={track.cover} alt={`Portada relacionada con ${track.title}`} /></div><div className="track-detail-copy"><p className="card-kicker">{track.genre || 'Grabación'} · {track.demoOnly ? 'demo original' : 'preview del catálogo'}</p><h2>{track.version || 'Versión original'}</h2><p>{track.demoOnly ? `Archivo demo completo · ${track.duration}.` : `Duración de catálogo ${track.duration}. El preview autorizado se conectará desde el backend cuando el archivo esté cargado.`}</p><div className="track-specs"><span><Clock3 size={15} /> {track.duration}</span><span><Disc3 size={15} /> {release?.title}</span>{track.bpm && <span>{track.bpm} BPM</span>}</div>{track.demoOnly ? <span className="demo-only-label">Solo demo</span> : <PriceButton offer={trackOffer(track, catalog.artists)} label="Comprar pista" />}<Link href={`/releases/${track.releaseId}`} className="text-link">Ver lanzamiento <ArrowRight size={16} /></Link></div></div>
-    <TrackVisualizer track={track} isPlaying={isCurrentTrack && isPlaying} analyser={isCurrentTrack ? audioAnalyser : null} progress={isCurrentTrack ? progress : 0} duration={duration} onToggle={() => isCurrentTrack ? togglePlayback() : playTrack(track)} />
+    <TrackVisualizer track={track} isPlaying={isCurrentTrack && isPlaying} analyser={isCurrentTrack ? audioAnalyser : null} progress={isCurrentTrack ? progress : 0} duration={duration} canSeek={isCurrentTrack} onToggle={() => isCurrentTrack ? togglePlayback() : playTrack(track)} onSeek={seekTo} />
   </div></div>;
 }
 

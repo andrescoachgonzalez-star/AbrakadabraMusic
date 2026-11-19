@@ -10,7 +10,9 @@ type TrackVisualizerProps = {
   analyser: AnalyserNode | null;
   progress: number;
   duration: number;
+  canSeek: boolean;
   onToggle: () => void;
+  onSeek: (time: number) => void;
 };
 
 const BAR_COUNT = 56;
@@ -20,7 +22,7 @@ function formatTime(value: number) {
   return `${Math.floor(totalSeconds / 60)}:${(totalSeconds % 60).toString().padStart(2, '0')}`;
 }
 
-export default function TrackVisualizer({ track, isPlaying, analyser, progress, duration, onToggle }: TrackVisualizerProps) {
+export default function TrackVisualizer({ track, isPlaying, analyser, progress, duration, canSeek, onToggle, onSeek }: TrackVisualizerProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const progressRatio = duration ? Math.min(100, (progress / duration) * 100) : 0;
 
@@ -106,7 +108,7 @@ export default function TrackVisualizer({ track, isPlaying, analyser, progress, 
         {isPlaying ? <Pause size={19} fill="currentColor" /> : <Play size={19} fill="currentColor" />}
       </button>
     </div>
-    <div className="track-visualizer-progress" aria-hidden="true"><span style={{ width: `${progressRatio}%` }} /></div>
+    <div className="track-visualizer-progress"><input className="seek-slider visualizer-seek" type="range" min={0} max={Math.max(1, duration)} step={1} value={Math.min(progress, duration)} style={{ '--seek-progress': `${progressRatio}%` } as React.CSSProperties} onChange={(event) => onSeek(Number(event.currentTarget.value))} disabled={!canSeek || duration <= 0} aria-label={`Buscar posición en ${track.title}`} aria-valuetext={`${formatTime(progress)} de ${formatTime(duration)}`} /></div>
     <div className="track-visualizer-foot"><span>{formatTime(progress)}</span><span>{formatTime(duration)} · {track.demoOnly ? 'demo del artista' : track.previewUrl ? 'preview del catálogo' : 'CC0 demo audio'}</span></div>
   </section>;
 }

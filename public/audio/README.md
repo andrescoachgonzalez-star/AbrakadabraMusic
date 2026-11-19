@@ -17,3 +17,11 @@ The following full-length demos were supplied for the Abrakadabra Music catalog 
 - `demos/esteban-arenas-8batzz-idxx-original-mix.wav` — IDxx (Original Mix), Esteban Arenas, 8Batzz.
 
 These are demo-only catalog entries and are not offered for purchase.
+
+## Cover image credits
+
+The track covers are illustrative images served from Unsplash; they are not official release artwork or photos of the artists. Unsplash marks each source as free to use under the Unsplash License.
+
+- Lose Control — Daniel Wirtz, [purple and orange LED light](https://unsplash.com/photos/purple-and-orange-led-light-Y9YebLTnjAA).
+- Arkana — Milad Fakurian, [abstract digital art with blue and gold elements](https://unsplash.com/photos/abstract-digital-art-with-glowing-blue-and-gold-elements-5yWtM3M3JKM).
+- IDxx — Akif Waseem, [abstract blue light on black](https://unsplash.com/photos/abstract-glowing-blue-light-on-black-background-5xkflju7KuA).
