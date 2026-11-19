@@ -9,6 +9,7 @@ export type Artist = {
   imagePositionMobile?: string;
   story?: string;
   gallery?: string[];
+  links?: Array<{ label: string; url: string }>;
 };
 
 export type Track = {
@@ -38,6 +39,10 @@ export type Release = {
   description: string;
   trackIds: string[];
   demoOnly?: boolean;
+  comingSoon?: boolean;
+  trackCount?: number;
+  packageDetails?: string[];
+  licenseTerms?: string[];
 };
 
 export type ProductOffer = {
@@ -55,8 +60,31 @@ const portrait = (background: string, accent: string, initials: string) =>
   `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 880"><rect width="700" height="880" fill="${background}"/><circle cx="510" cy="120" r="150" fill="${accent}" opacity=".5"/><path d="M0 720C80 545 178 490 350 490S620 545 700 720v160H0Z" fill="${accent}"/><circle cx="350" cy="300" r="144" fill="#191716"/><path d="M205 310c20-168 266-180 292 0-50-43-87-58-143-58s-106 20-149 58Z" fill="${accent}"/><circle cx="306" cy="330" r="9" fill="white"/><circle cx="394" cy="330" r="9" fill="white"/><path d="M300 405c36 26 66 26 100 0" fill="none" stroke="white" stroke-width="7" stroke-linecap="round"/><text x="44" y="810" fill="white" font-family="Arial,sans-serif" font-weight="700" font-size="26" letter-spacing="8">${initials}</text></svg>`)}`;
 
 export const ARTISTS: Artist[] = [
-  { id: '8batzz', name: '8Batzz', location: 'Ubicación por confirmar', bio: 'Perfil de artista pendiente de completar.', color: '#cf4c38' },
-  { id: 'esteban-arenas', name: 'Esteban Arenas', location: 'Ubicación por confirmar', bio: 'Perfil de artista pendiente de completar.', color: '#bb9a5e' },
+  {
+    id: '8batzz', name: '8BATZZ', location: 'Pereira, Colombia',
+    bio: 'DJ y productor colombiano de House, Tech House y Afro House. Combina grooves profundos, percusión orgánica y atmósferas hipnóticas para convertir la música en conexión.',
+    color: '#cf4c38', image: 'https://abrakadabrarealm.com/Image-DJs/8batzz.png', imagePosition: '50% 22%',
+    imagePositionMobile: '50% 20%', gallery: ['/artists/solaris-session-headphones.png', '/artists/solaris-session-red.jpg'],
+    story: 'Nacido en Pereira, 8BATZZ encontró en la música una herramienta de transformación personal. Su curiosidad por las vibraciones del sonido y el desarrollo personal dio forma a una identidad que conecta grooves profundos, percusión orgánica y atmósferas creadas para la pista. Como DJ ha llevado su propuesta a escenarios de Miami y Nueva York, incluidos MITA y La Escena. En SOLARIS comparte una selección junto a Esteban Arenas.',
+    links: [
+      { label: 'Instagram', url: 'https://www.instagram.com/8batzz/' },
+      { label: 'Beatport', url: 'https://www.beatport.com/artist/8batzz/1256537' },
+      { label: 'SoundCloud', url: 'https://soundcloud.com/user-628165542' },
+    ],
+  },
+  {
+    id: 'esteban-arenas', name: 'Esteban Arenas', location: 'Medellín, Colombia',
+    bio: 'DJ y productor colombiano con una propuesta que cruza Afro House, Tech House y Groove House: grooves precisos, percusión orgánica y energía para la pista.',
+    color: '#bb9a5e', image: 'https://abrakadabrarealm.com/Image-DJs/esteban-arenas.png', imagePosition: '50% 22%',
+    imagePositionMobile: '50% 20%', gallery: ['/artists/solaris-session-headphones.png', '/artists/solaris-session-red.jpg'],
+    story: 'Esteban Daniel Arenas Cardona nació en Armenia, Quindío, y se trasladó a Medellín para estudiar Producción Musical. Empezó a producir con recursos sencillos en su habitación y construyó allí una identidad propia mediante el estudio y la experimentación. Su sonido fusiona Afro House, Tech House y Groove House. Entre sus lanzamientos están “Ponce”, publicado por Rituals, además de “La Aldea”, “Rápido”, “Apocalipsis”, “Tírese Muchacho”, “Fogo” y “Elewy”. SOLARIS reúne una colección creada junto a 8BATZZ.',
+    links: [
+      { label: 'Instagram', url: 'https://www.instagram.com/estebanarenas_dj/' },
+      { label: 'YouTube', url: 'https://www.youtube.com/@djestebanarenas' },
+      { label: 'Beatport', url: 'https://www.beatport.com/artist/esteban-arenas/1008127' },
+      { label: 'SoundCloud', url: 'https://soundcloud.com/esteban-arenasdj' },
+    ],
+  },
   { id: 'alankoll', name: 'Alankoll', location: 'Ubicación por confirmar', bio: 'Perfil de artista pendiente de completar.', color: '#4a665c' },
   { id: 'lua-mar', name: 'Lua Mar', location: 'Medellín, CO', bio: 'Ritmos lentos, texturas de club y canciones para escuchar con la ciudad apagada.', color: '#8f382d', image: '/artists/lua-mar-editorial-v2.png', imagePosition: '60% 32%', imagePositionMobile: '58% 28%', story: 'Lua Mar trabaja el pulso como una habitación: deja espacio para que el bajo respire, para que una voz aparezca tarde y para que la noche también tenga memoria.', gallery: [] },
   { id: 'nomada-lumen', name: 'Nómada Lumen', location: 'Bogotá, CO', bio: 'Electrónica cálida y paisajes de sintetizador que encuentran luz en el ruido.', color: '#d19b48', image: '/artists/nomada-lumen-editorial-v1.png', imagePosition: '50% 44%', imagePositionMobile: '50% 38%' },
@@ -72,6 +100,13 @@ export const RELEASES: Release[] = [
   { id: 'cartografia-noche', title: 'Cartografía de la noche', artistIds: ['nomada-lumen', 'clara-humo'], type: 'Álbum', date: '2026-04-18', price: 26000, cover: '/releases/cartografia-noche-cover-v1.png', description: 'Un mapa compartido entre sintetizadores de Bogotá y voces de Cali.', trackIds: ['mapa-01', 'mapa-02', 'mapa-03'] },
   { id: 'sudor-lento', title: 'Sudor lento', artistIds: ['rito-verde'], type: 'Sencillo', date: '2026-06-04', price: 9000, cover: '/releases/sudor-lento-cover-v1.png', description: 'Una sola frecuencia, tres minutos para volver al centro.', trackIds: ['sudor-01'] },
   { id: 'archivo-azul', title: 'Archivo azul', artistIds: ['lua-mar', 'clara-humo'], type: 'Álbum', date: '2026-02-09', price: 22000, cover: '/releases/archivo-azul-cover-v1.png', description: 'Canciones que quedaron encendidas después del último evento.', trackIds: ['azul-01', 'azul-02'] },
+  {
+    id: 'solaris', title: 'SOLARIS', artistIds: ['8batzz', 'esteban-arenas'], type: 'Álbum',
+    price: 0, cover: '/releases/solaris-cover.jpg', description: 'Una colección de 10 tracks de 8BATZZ y Esteban Arenas: Afro House, Tech House y Groove House para llevar otra energía a la cabina.',
+    trackIds: [], comingSoon: true, trackCount: 10,
+    packageDetails: ['10 canciones completas', 'Archivos WAV de 24 bits', 'Extended Mix para DJs', 'Descarga digital inmediata después de la compra'],
+    licenseTerms: ['Permitido: reproducir en eventos y discotecas, publicar sets en YouTube o SoundCloud y usar fragmentos en Instagram y TikTok.', 'No permitido: revender, redistribuir, registrar los tracks a tu nombre ni presentarte como autor o propietario.'],
+  },
 ];
 
 export const TRACKS: Track[] = [

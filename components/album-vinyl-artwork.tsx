@@ -6,6 +6,7 @@ type AlbumVinylArtworkProps = {
   size?: 'gallery' | 'card' | 'detail';
   isActive?: boolean;
   isPlaying?: boolean;
+  coverFit?: 'cover' | 'contain';
   className?: string;
 };
 
@@ -19,6 +20,7 @@ export default function AlbumVinylArtwork({
   size = 'card',
   isActive = false,
   isPlaying = false,
+  coverFit = 'cover',
   className = '',
 }: AlbumVinylArtworkProps) {
   const classes = [
@@ -26,6 +28,7 @@ export default function AlbumVinylArtwork({
     `album-vinyl-artwork--${size}`,
     isActive ? 'is-active' : '',
     isPlaying ? 'is-playing' : '',
+    coverFit === 'contain' ? 'album-vinyl-artwork--contain' : '',
     className,
   ].filter(Boolean).join(' ');
   const isGallery = size === 'gallery';
