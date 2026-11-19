@@ -107,6 +107,6 @@ export default function TrackVisualizer({ track, isPlaying, analyser, progress, 
       </button>
     </div>
     <div className="track-visualizer-progress" aria-hidden="true"><span style={{ width: `${progressRatio}%` }} /></div>
-    <div className="track-visualizer-foot"><span>{formatTime(progress)}</span><span>{formatTime(duration)} · CC0 demo audio</span></div>
+    <div className="track-visualizer-foot"><span>{formatTime(progress)}</span><span>{formatTime(duration)} · {track.demoOnly ? 'demo del artista' : track.previewUrl ? 'preview del catálogo' : 'CC0 demo audio'}</span></div>
   </section>;
 }

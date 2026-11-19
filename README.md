@@ -21,7 +21,7 @@ La app queda disponible en `http://localhost:3000` (o el puerto que Next elija).
 
 ## Catálogo conectado
 
-La aplicación intenta cargar el catálogo publicado desde `NEXT_PUBLIC_API_URL` (por defecto `http://localhost:3000/api`) mediante `/music/artists`, `/music/releases` y `/music/tracks`. Si el backend todavía no tiene contenido publicado, conserva el catálogo demo local para facilitar el desarrollo. Las pistas usan `preview_url` cuando existe y, mientras tanto, mantienen el audio demo local.
+La aplicación intenta cargar el catálogo publicado desde `NEXT_PUBLIC_API_URL` (por defecto `http://localhost:3000/api`) mediante `/music/artists`, `/music/releases` y `/music/tracks`. Si el backend todavía no tiene contenido publicado, conserva el catálogo demo local para facilitar el desarrollo. Las pistas usan `preview_url` cuando existe; el catálogo local usa audio demo propio cuando está disponible y el audio CC0 como fallback.
 
 El checkout requiere iniciar sesión para crear un pedido persistente. En desarrollo local se puede aprobar con el simulador y consultar el resultado en `/account/orders` y `/account/library`; no se realizan cobros reales.
 
@@ -91,11 +91,11 @@ El hover de la galería mantiene una altura fija por panel y anima únicamente e
 
 La página individual de pista (`/tracks/:id`) usa un canvas negro de 56 barras simétricas conectado al `AnalyserNode` del mismo reproductor persistente. El MP3 de demostración se reutiliza para todas las pistas del catálogo local. Dentro de la pista la barra global se oculta y el control aparece junto al visualizador; al salir de la ruta vuelve la barra inferior. El botón `Cerrar reproductor` pausa y retira la barra cuando el usuario lo solicita.
 
-El archivo local `public/audio/nighttime-solitude-cc0.mp3` es “Nighttime Solitude”, de celestialghost8, descargado desde OpenGameArt bajo CC0. La fuente y la licencia están documentadas en `public/audio/README.md`. Es solo un audio de validación visual y debe sustituirse por demos/másters autorizados antes de publicar.
+El archivo local `public/audio/nighttime-solitude-cc0.mp3` es “Nighttime Solitude”, de celestialghost8, descargado desde OpenGameArt bajo CC0. La fuente y la licencia están documentadas en `public/audio/README.md`; sigue como fallback para las pistas demo ficticias. Los demos completos de 8Batzz, Esteban Arenas y Alankoll están en `public/audio/demos/` y se reproducen solo en sus pistas de catálogo.
 
 ## Datos y recursos pendientes
 
-El catálogo es demo y está marcado como tal en UI. Las portadas actuales son cuatro imágenes PNG ficticias generadas para validar dirección de arte; el retrato de Lua Mar es una imagen editorial original temporal para validar la composición. El reproductor usa un MP3 CC0 local compartido para validar controles, eventos, pausa, cambio rápido, análisis de frecuencia y fin de reproducción; no representa demos musicales oficiales del catálogo.
+El catálogo local mezcla fichas de artistas demo con tres demos originales suministrados para Abrakadabra Music: “Lose Control” de 8Batzz, “Arkana” de 8Batzz, Esteban Arenas y Alankoll, e “IDxx” de Esteban Arenas y 8Batzz. Las tres pistas aparecen en Artistas, Lanzamientos y Pistas, usan archivos de audio propios y están marcadas como solo demo, sin precio de compra. La imagen de portada permanece como arte genérico del catálogo hasta recibir portadas aprobadas.
 
 Recursos que deben sustituirse antes de una publicación: fotografía protagonista autorizada de cada artista, fotografías de historia/galería, los tres retratos editoriales demo añadidos en esta iteración, portadas finales y banners aprobados, demos de audio autorizados y sus peaks/waveforms. La UI marca explícitamente que el archivo visual de Lua Mar está pendiente. No se descargaron imágenes ni audios del referente.
 
