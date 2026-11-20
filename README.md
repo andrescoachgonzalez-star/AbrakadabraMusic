@@ -91,7 +91,7 @@ El hover de la galería mantiene una altura fija por panel y anima únicamente e
 
 La página individual de pista (`/tracks/:id`) usa un canvas negro de 56 barras simétricas conectado al `AnalyserNode` del mismo reproductor persistente. Cada pista usa su archivo demo cuando está definido y el MP3 CC0 queda como fallback. Dentro de la pista la barra global se oculta y el control aparece junto al visualizador; al salir de la ruta vuelve la barra inferior. El botón `Cerrar reproductor` pausa y retira la barra cuando el usuario lo solicita.
 
-El archivo local `public/audio/nighttime-solitude-cc0.mp3` es “Nighttime Solitude”, de celestialghost8, descargado desde OpenGameArt bajo CC0. La fuente y la licencia están documentadas en `public/audio/README.md`; sigue como fallback para las pistas demo ficticias. Los demos completos de 8Batzz, Esteban Arenas y Alankoll están en `public/audio/demos/` y se reproducen solo en sus pistas de catálogo.
+El archivo local `public/audio/nighttime-solitude-cc0.mp3` es “Nighttime Solitude”, de celestialghost8, descargado desde OpenGameArt bajo CC0. La fuente y la licencia están documentadas en `public/audio/README.md`; sigue como fallback para las pistas demo ficticias. Los demos de 8BATZZ, Esteban Arenas y Alankoll se sirven como previews de 30 segundos en `public/audio/previews/`; los WAV completos no se publican desde el sitio.
 
 ## Datos y recursos pendientes
 

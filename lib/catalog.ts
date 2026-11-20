@@ -10,6 +10,8 @@ export type Artist = {
   story?: string;
   gallery?: string[];
   links?: Array<{ label: string; url: string }>;
+  genres?: string[];
+  hireable?: boolean;
 };
 
 export type Track = {
@@ -63,8 +65,8 @@ export const ARTISTS: Artist[] = [
   {
     id: '8batzz', name: '8BATZZ', location: 'Pereira, Colombia',
     bio: 'DJ y productor colombiano de House, Tech House y Afro House. Combina grooves profundos, percusión orgánica y atmósferas hipnóticas para convertir la música en conexión.',
-    color: '#cf4c38', image: 'https://abrakadabrarealm.com/Image-DJs/8batzz.png', imagePosition: '50% 22%',
-    imagePositionMobile: '50% 20%', gallery: ['/artists/solaris-session-headphones.png', '/artists/solaris-session-red.jpg'],
+    color: '#cf4c38', image: '/artists/djs/8batzz.png', imagePosition: '50% 22%',
+    imagePositionMobile: '50% 20%', gallery: [],
     story: 'Nacido en Pereira, 8BATZZ encontró en la música una herramienta de transformación personal. Su curiosidad por las vibraciones del sonido y el desarrollo personal dio forma a una identidad que conecta grooves profundos, percusión orgánica y atmósferas creadas para la pista. Como DJ ha llevado su propuesta a escenarios de Miami y Nueva York, incluidos MITA y La Escena. En SOLARIS comparte una selección junto a Esteban Arenas.',
     links: [
       { label: 'Instagram', url: 'https://www.instagram.com/8batzz/' },
@@ -75,8 +77,8 @@ export const ARTISTS: Artist[] = [
   {
     id: 'esteban-arenas', name: 'Esteban Arenas', location: 'Medellín, Colombia',
     bio: 'DJ y productor colombiano con una propuesta que cruza Afro House, Tech House y Groove House: grooves precisos, percusión orgánica y energía para la pista.',
-    color: '#bb9a5e', image: 'https://abrakadabrarealm.com/Image-DJs/esteban-arenas.png', imagePosition: '50% 22%',
-    imagePositionMobile: '50% 20%', gallery: ['/artists/solaris-session-headphones.png', '/artists/solaris-session-red.jpg'],
+    color: '#bb9a5e', image: '/artists/djs/esteban-arenas.png', imagePosition: '50% 22%',
+    imagePositionMobile: '50% 20%', gallery: [],
     story: 'Esteban Daniel Arenas Cardona nació en Armenia, Quindío, y se trasladó a Medellín para estudiar Producción Musical. Empezó a producir con recursos sencillos en su habitación y construyó allí una identidad propia mediante el estudio y la experimentación. Su sonido fusiona Afro House, Tech House y Groove House. Entre sus lanzamientos están “Ponce”, publicado por Rituals, además de “La Aldea”, “Rápido”, “Apocalipsis”, “Tírese Muchacho”, “Fogo” y “Elewy”. SOLARIS reúne una colección creada junto a 8BATZZ.',
     links: [
       { label: 'Instagram', url: 'https://www.instagram.com/estebanarenas_dj/' },
@@ -90,6 +92,16 @@ export const ARTISTS: Artist[] = [
   { id: 'nomada-lumen', name: 'Nómada Lumen', location: 'Bogotá, CO', bio: 'Electrónica cálida y paisajes de sintetizador que encuentran luz en el ruido.', color: '#d19b48', image: '/artists/nomada-lumen-editorial-v1.png', imagePosition: '50% 44%', imagePositionMobile: '50% 38%' },
   { id: 'clara-humo', name: 'Clara y Humo', location: 'Cali, CO', bio: 'Voces cercanas, guitarras suspendidas y una forma íntima de contar la noche.', color: '#4e706b', image: '/artists/clara-humo-editorial-v1.png', imagePosition: '50% 42%', imagePositionMobile: '50% 36%' },
   { id: 'rito-verde', name: 'Rito Verde', location: 'Cartagena, CO', bio: 'Percusión tropical, bajos profundos y una pista que siempre vuelve al cuerpo.', color: '#c7622c', image: '/artists/rito-verde-editorial-v1.png', imagePosition: '50% 42%', imagePositionMobile: '50% 36%' },
+];
+
+export const DJ_PRODUCERS: Artist[] = [
+  { id: '8batzz', name: '8BATZZ', location: 'Pereira, Colombia', bio: ARTISTS[0].bio, color: '#cf4c38', image: '/artists/djs/8batzz.png', genres: ['Afro House', 'Tech House', 'Afro Melodic'], hireable: true, links: ARTISTS[0].links },
+  { id: 'esteban-arenas', name: 'Esteban Arenas', location: 'Medellín, Colombia', bio: ARTISTS[1].bio, color: '#bb9a5e', image: '/artists/djs/esteban-arenas.png', genres: ['Afro House', 'Tech House', 'Groove House'], hireable: true, links: ARTISTS[1].links },
+  { id: 'mara', name: 'Mara', location: 'Colombia', bio: 'DJ y productor colombiano con trayectoria internacional en la música electrónica.', color: '#b84235', image: '/artists/djs/mara.png', genres: [], hireable: true },
+  { id: 'mulan', name: 'Mulan', location: 'Colombia', bio: 'DJ y productora con sets de House, Tech House y Afro House.', color: '#7a4568', image: '/artists/djs/mulan.png', genres: ['House', 'Tech House', 'Afro House'], hireable: true },
+  { id: 'joseph-ren', name: 'Joseph Ren', location: 'Colombia', bio: 'DJ colombiano que crea experiencias de pista a través de la música electrónica.', color: '#52716a', image: '/artists/djs/joseph-ren.png', genres: [], hireable: true },
+  { id: 'redbeard', name: 'Redbeard', location: 'Medellín, Colombia', bio: 'DJ y productor enfocado en Tech House y Minimal Deep Tech, con lanzamientos en sellos como Kubo Records, SexAppeal Music, Kore Music y Samba.', color: '#8b493b', image: '/artists/djs/redbeard.png', genres: ['Tech House', 'Minimal Deep Tech'], hireable: true },
+  { id: 'rizzo', name: 'Rizzo', location: 'Pereira, Colombia', bio: 'DJ y productor de House y Tech House, con percusión orgánica y grooves profundos.', color: '#c08a45', image: '/artists/djs/rizzo.png', genres: ['House', 'Tech House'], hireable: true },
 ];
 
 export const RELEASES: Release[] = [
@@ -110,9 +122,9 @@ export const RELEASES: Release[] = [
 ];
 
 export const TRACKS: Track[] = [
-  { id: 'lose-control', title: 'Lose Control', version: 'Original Mix', artistIds: ['8batzz'], releaseId: 'lose-control', duration: '04:32', previewSeconds: 272, previewUrl: '/audio/demos/8batzz-lose-control-original-mix.wav', price: 0, cover: RELEASES[0].cover, demoOnly: true },
-  { id: 'arkana', title: 'Arkana', version: 'Original Mix', artistIds: ['8batzz', 'esteban-arenas', 'alankoll'], releaseId: 'arkana', duration: '06:07', previewSeconds: 368, previewUrl: '/audio/demos/8batzz-esteban-arenas-alankoll-arkana-original-mix.wav', price: 0, cover: RELEASES[1].cover, demoOnly: true },
-  { id: 'idxx', title: 'IDxx', version: 'Original Mix', artistIds: ['esteban-arenas', '8batzz'], releaseId: 'idxx', duration: '07:00', previewSeconds: 420, previewUrl: '/audio/demos/esteban-arenas-8batzz-idxx-original-mix.wav', price: 0, cover: RELEASES[2].cover, demoOnly: true },
+  { id: 'lose-control', title: 'Lose Control', version: 'Original Mix', artistIds: ['8batzz'], releaseId: 'lose-control', duration: '04:32', previewSeconds: 30, previewUrl: '/audio/previews/8batzz-lose-control-preview.wav', price: 0, cover: RELEASES[0].cover, demoOnly: true },
+  { id: 'arkana', title: 'Arkana', version: 'Original Mix', artistIds: ['8batzz', 'esteban-arenas', 'alankoll'], releaseId: 'arkana', duration: '06:07', previewSeconds: 30, previewUrl: '/audio/previews/arkana-preview.wav', price: 0, cover: RELEASES[1].cover, demoOnly: true },
+  { id: 'idxx', title: 'IDxx', version: 'Original Mix', artistIds: ['esteban-arenas', '8batzz'], releaseId: 'idxx', duration: '07:00', previewSeconds: 30, previewUrl: '/audio/previews/idxx-preview.wav', price: 0, cover: RELEASES[2].cover, demoOnly: true },
   { id: 'sal-01', title: 'Fulgor de patio', version: 'Versión de álbum', artistIds: ['lua-mar'], releaseId: 'luz-de-sal', duration: '04:12', previewSeconds: 4, price: 6000, bpm: 112, genre: 'Electrónica', cover: RELEASES[3].cover },
   { id: 'sal-02', title: 'La marea interior', version: 'Edit', artistIds: ['lua-mar'], releaseId: 'luz-de-sal', duration: '05:08', previewSeconds: 4, price: 6000, bpm: 108, genre: 'Ambient house', cover: RELEASES[3].cover },
   { id: 'sal-03', title: 'Luz de sal', artistIds: ['lua-mar'], releaseId: 'luz-de-sal', duration: '03:42', previewSeconds: 4, price: 6000, genre: 'Downtempo', cover: RELEASES[3].cover },

@@ -896,3 +896,58 @@ body:has(.track-page-shell) .site-footer p, body:has(.track-page-shell) .site-fo
   .player-buy { order: 5; }
   .player-buy span, .player-queue { display: none; }
 }
+
+/* DJ discovery and booking */
+.djs-page-shell { min-height: 70vh; color: var(--paper); background: #080808; padding-bottom: 90px; }
+.djs-page-shell .page-intro h1 { color: var(--paper); }
+.djs-page-shell .page-intro > p:last-child { max-width: 660px; color: rgba(244,240,233,.62); }
+.djs-page-shell .filter-row { border-bottom-color: rgba(244,240,233,.18); }
+.djs-page-shell .filter-row > span { color: rgba(244,240,233,.55); }
+.djs-page-shell .filter-tabs button { min-height: 44px; padding-inline: 14px; color: rgba(244,240,233,.62); }
+.djs-page-shell .filter-tabs button.selected { color: #fff; border-color: #f07b6e; }
+.dj-lineup-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.dj-lineup-card { display: grid; grid-template-columns: minmax(150px, .72fr) 1fr; min-height: 300px; overflow: hidden; border: 1px solid rgba(244,240,233,.16); background: #111; }
+.dj-lineup-photo { min-height: 300px; background: #211a18; }
+.dj-lineup-photo img { width: 100%; height: 100%; object-fit: cover; }
+.dj-lineup-meta { display: flex; flex-direction: column; align-items: flex-start; padding: 23px; }
+.dj-lineup-meta h2 { margin: 3px 0 10px; font: 400 clamp(24px, 2.7vw, 36px)/1 var(--font-display); }
+.dj-lineup-meta > p:not(.card-kicker) { margin: 0 0 16px; color: rgba(244,240,233,.66); font-size: 12px; line-height: 1.7; }
+.dj-genre-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: auto 0 16px; padding-top: 8px; }
+.dj-genre-tags span { padding: 5px 8px; border: 1px solid rgba(244,240,233,.18); color: rgba(244,240,233,.7); font-size: 9px; }
+.dj-lineup-meta .button-outline { border-color: rgba(244,240,233,.28); color: var(--paper); }
+.dj-booking { display: grid; grid-template-columns: minmax(230px, .8fr) minmax(0, 1.2fr); gap: clamp(30px, 8vw, 100px); margin-top: 105px; padding: clamp(24px, 5vw, 64px); border: 1px solid rgba(244,240,233,.18); background: #101010; scroll-margin-top: 100px; }
+.dj-booking h2, .testimonial-section h2 { margin: 15px 0 18px; font: 400 clamp(38px, 5vw, 64px)/.98 var(--font-display); letter-spacing: -.04em; }
+.dj-booking h2 em, .testimonial-section h2 em { color: #f07b6e; }
+.dj-booking > div > p:last-child { max-width: 330px; color: rgba(244,240,233,.6); line-height: 1.75; }
+.dj-booking-form { display: flex; flex-direction: column; gap: 15px; }
+.dj-booking-form label { display: flex; flex: 1; min-width: 0; flex-direction: column; gap: 7px; color: rgba(244,240,233,.84); font-size: 11px; font-weight: 600; }
+.dj-booking-form .form-row { display: flex; gap: 14px; }
+.dj-booking-form input, .dj-booking-form select, .dj-booking-form textarea { width: 100%; min-height: 46px; border: 1px solid rgba(244,240,233,.2); border-radius: 0; padding: 10px 12px; color: var(--paper); background: #080808; font: inherit; }
+.dj-booking-form textarea { min-height: 110px; resize: vertical; }
+.dj-booking-form input:focus, .dj-booking-form select:focus, .dj-booking-form textarea:focus { border-color: #f07b6e; outline: 2px solid rgba(240,123,110,.25); outline-offset: 1px; }
+.dj-booking-form input::placeholder, .dj-booking-form textarea::placeholder { color: rgba(244,240,233,.38); }
+.dj-booking-form .button { align-self: flex-start; }
+.dj-booking-form .button:disabled { opacity: .55; cursor: wait; }
+.license-card { max-width: 760px; padding: clamp(24px, 5vw, 55px); border: 1px solid var(--line); background: #fff; }
+.license-card ul { margin: 11px 0 30px; padding-left: 19px; color: #514b45; line-height: 1.9; }
+.license-card > p:not(.eyebrow) { margin: 28px 0; color: var(--muted); line-height: 1.7; }
+.honest-empty { margin: 0; padding: 28px 0; border-top: 1px solid rgba(244,240,233,.18); color: rgba(244,240,233,.62); font-size: 13px; }
+.best-seller-track .track-row { grid-template-columns: 34px 34px minmax(150px,1fr) 90px; color: var(--paper); border-color: rgba(244,240,233,.18); }
+.best-seller-track .track-info a, .best-seller-track .track-number { color: var(--paper); }
+.testimonial-section { max-width: 1180px; }
+.testimonial-section > p:last-child { max-width: 510px; color: rgba(244,240,233,.6); line-height: 1.8; }
+.homepage-shell .testimonial-section { background: #080808; }
+
+@media (max-width: 760px) {
+  .dj-lineup-grid { grid-template-columns: 1fr; }
+  .dj-lineup-card { grid-template-columns: minmax(118px, .7fr) 1fr; min-height: 250px; }
+  .dj-lineup-photo { min-height: 250px; }
+  .dj-lineup-meta { padding: 17px; }
+  .dj-booking { grid-template-columns: 1fr; gap: 20px; margin-top: 75px; }
+  .dj-booking-form .form-row { flex-direction: column; }
+  .djs-page-shell .filter-tabs { flex-wrap: wrap; }
+}
+@media (max-width: 420px) {
+  .dj-lineup-card { grid-template-columns: 1fr; }
+  .dj-lineup-photo { height: 300px; min-height: auto; }
+}

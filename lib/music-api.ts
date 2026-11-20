@@ -43,7 +43,7 @@ type ApiRelease = {
   tracks?: ApiTrack[];
 };
 
-export const MUSIC_API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api').replace(/\/$/, '');
+export const MUSIC_API_URL = (process.env.NEXT_PUBLIC_API_URL || 'https://api.abrakadabrarealm.com/api').replace(/\/$/, '');
 export const MUSIC_TOKEN_KEY = 'abrakadabra_music_token';
 const fallbackCover = '/images/music/vinyl-record.png';
 const fallbackColors = ['#8f382d', '#d19b48', '#4e706b', '#c7622c'];
@@ -132,6 +132,19 @@ export async function fetchMusicCatalog(): Promise<MusicCatalog | null> {
     return { artists: artistModels, releases: releaseModels, tracks: trackModels };
   } catch {
     return null;
+  }
+}
+
+export type BestSeller = { kind: 'release' | 'track'; id: string; units: number };
+
+export async function fetchMusicBestsellers(): Promise<BestSeller[]> {
+  try {
+    const response = await fetch(`${MUSIC_API_URL}/music/bestsellers`, { cache: 'no-store' });
+    if (!response.ok) return [];
+    const rows = await response.json() as Array<{ item_type: 'release' | 'track'; item_id: string; units_sold: number | string }>;
+    return rows.map((row) => ({ kind: row.item_type, id: row.item_id, units: toNumber(row.units_sold) }));
+  } catch {
+    return [];
   }
 }
 
