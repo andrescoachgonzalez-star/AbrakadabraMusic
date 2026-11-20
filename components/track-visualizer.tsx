@@ -104,11 +104,11 @@ export default function TrackVisualizer({ track, isPlaying, analyser, progress, 
   return <section className="track-visualizer" aria-label={`Visualizador de ${track.title}`}>
     <div className="track-visualizer-stage">
       <canvas ref={canvasRef} className="track-visualizer-canvas" aria-hidden="true" />
-      <button className={`track-visualizer-play ${isPlaying ? 'is-playing' : ''}`} type="button" onClick={onToggle} aria-label={isPlaying ? `Pausar ${track.title}` : `Reproducir ${track.title}`}>
+      <button className={`track-visualizer-play ${isPlaying ? 'is-playing' : ''}`} type="button" onClick={onToggle} disabled={!track.previewUrl} aria-label={!track.previewUrl ? `Preview no disponible para ${track.title}` : isPlaying ? `Pausar ${track.title}` : `Reproducir ${track.title}`}>
         {isPlaying ? <Pause size={19} fill="currentColor" /> : <Play size={19} fill="currentColor" />}
       </button>
     </div>
     <div className="track-visualizer-progress"><input className="seek-slider visualizer-seek" type="range" min={0} max={Math.max(1, duration)} step={1} value={Math.min(progress, duration)} style={{ '--seek-progress': `${progressRatio}%` } as React.CSSProperties} onChange={(event) => onSeek(Number(event.currentTarget.value))} disabled={!canSeek || duration <= 0} aria-label={`Buscar posición en ${track.title}`} aria-valuetext={`${formatTime(progress)} de ${formatTime(duration)}`} /></div>
-    <div className="track-visualizer-foot"><span>{formatTime(progress)}</span><span>{formatTime(duration)} · {track.demoOnly ? 'demo del artista' : track.previewUrl ? 'preview del catálogo' : 'CC0 demo audio'}</span></div>
+    <div className="track-visualizer-foot"><span>{formatTime(progress)}</span><span>{formatTime(duration)} · {track.demoOnly ? 'demo del artista' : track.previewUrl ? 'preview del catálogo' : 'preview no disponible'}</span></div>
   </section>;
 }

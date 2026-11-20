@@ -108,7 +108,7 @@ export async function fetchMusicCatalog(): Promise<MusicCatalog | null> {
         title: release.title,
         artistIds,
         type: releaseType(release.type),
-        date: release.release_date || new Date().toISOString(),
+        date: release.release_date || undefined,
         price: toNumber(release.price),
         cover: normalizeAsset(release.cover_url),
         description: release.description || 'Un lanzamiento del catálogo Abrakadabra Music.',

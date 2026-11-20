@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import * as React from 'react';
 import { FormEvent, ReactNode, useEffect, useMemo, useRef, useState } from 'react';
@@ -9,10 +10,7 @@ import {
   Heart, Library, Menu, Music2, Pause, Play, Plus, Search, ShoppingBag, ShoppingCart,
   SlidersHorizontal, Sparkles, UserRound, Volume2, X,
 } from 'lucide-react';
-import {
-  ARTISTS, RELEASES, TRACKS, Artist, ProductOffer, Release, Track,
-  artistById, artistName, formatCOP, releaseById, releaseOffer, trackById, trackOffer,
-} from '@/lib/catalog';
+import { Artist, ProductOffer, Release, Track, artistName, formatCOP, releaseOffer, trackOffer } from '@/lib/catalog';
 import { ArtistApplication, createArtistApplication, createArtistProfile, createMusicOrder, createMusicRelease, createMusicTrack, fetchMusicBestsellers, fetchMusicCatalog, fallbackCatalog, getArtistProfile, getMusicLibrary, getMusicMe, getMusicOrders, getMyArtistApplications, loginMusic, MUSIC_API_URL, MUSIC_TOKEN_KEY, MusicCatalog, MusicEntitlement, MusicOrder, MusicUser, registerMusic, simulateMusicPayment, submitMusicRelease, uploadMusicFile } from '@/lib/music-api';
 import TrackVisualizer from '@/components/track-visualizer';
 import AlbumVinylArtwork from '@/components/album-vinyl-artwork';
@@ -56,7 +54,10 @@ export function useMusic() {
   return context;
 }
 
-const DEMO_AUDIO_URL = '/audio/nighttime-solitude-cc0.mp3';
+function ArtistPhoto({ src, alt, style, priority = false }: { src: string; alt: string; style?: React.CSSProperties; priority?: boolean }) {
+  if (src.startsWith('/')) return <Image src={src} alt={alt} fill sizes="(max-width: 620px) 44vw, (max-width: 900px) 44vw, 25vw" priority={priority} style={style} />;
+  return <img src={src} alt={alt} style={style} loading={priority ? 'eager' : 'lazy'} decoding="async" />;
+}
 
 function hasArtistRole(user: MusicUser | null) {
   return user?.roles?.some((role) => role.slug === 'artista') ?? false;
@@ -151,7 +152,8 @@ export function MusicProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!activeTrack || !audioRef.current) return;
     const audio = audioRef.current;
-    audio.src = activeTrack.previewUrl || DEMO_AUDIO_URL;
+    if (!activeTrack.previewUrl) return;
+    audio.src = activeTrack.previewUrl;
     audio.load();
     audio.currentTime = 0;
     setProgress(0); setAudioError(null);
@@ -173,6 +175,7 @@ export function MusicProvider({ children }: { children: ReactNode }) {
   }, [demoUser]);
 
   const playTrack = (track: Track) => {
+    if (!track.previewUrl) return;
     if (activeTrack?.id === track.id) { togglePlayback(); return; }
     pendingPlay.current = true; setActiveTrack(track);
   };
@@ -255,7 +258,7 @@ export function Header() {
       <div className="header-actions">
         <Link href={demoUser ? '/account' : '/account/login'} className="icon-action" aria-label="Cuenta"><UserRound size={18} /><span className="action-label">Cuenta</span></Link>
         <button className="icon-action cart-action" onClick={() => setCartOpen(true)} aria-label={`Carrito, ${cart.length} productos`}><ShoppingCart size={18} /><span className="action-label">Carrito</span>{cart.length > 0 && <b>{cart.length}</b>}</button>
-        <button className="menu-button" aria-label="Abrir menú" onClick={() => setMobileOpen((open) => !open)}>{mobileOpen ? <X size={21} /> : <Menu size={21} />}</button>
+        <button className="menu-button" aria-label={mobileOpen ? 'Cerrar menú' : 'Abrir menú'} aria-expanded={mobileOpen} onClick={() => setMobileOpen((open) => !open)}>{mobileOpen ? <X size={21} /> : <Menu size={21} />}</button>
       </div>
     </div>
   </header>;
@@ -272,7 +275,7 @@ function SectionHeading({ eyebrow, title, link, href }: { eyebrow: string; title
 function PlayButton({ track, large = false, tabIndex }: { track: Track; large?: boolean; tabIndex?: number }) {
   const { activeTrack, isPlaying, playTrack } = useMusic();
   const active = activeTrack?.id === track.id;
-  return <button className={`play-button ${large ? 'large' : ''} ${active && isPlaying ? 'playing' : ''}`} tabIndex={tabIndex} onClick={() => playTrack(track)} aria-label={`${active && isPlaying ? 'Pausar' : 'Escuchar'} demo de ${track.title}`}>{active && isPlaying ? <Pause size={large ? 20 : 15} fill="currentColor" /> : <Play size={large ? 20 : 15} fill="currentColor" />}</button>;
+  return <button className={`play-button ${large ? 'large' : ''} ${active && isPlaying ? 'playing' : ''}`} tabIndex={tabIndex} onClick={() => playTrack(track)} disabled={!track.previewUrl} title={!track.previewUrl ? 'Preview no disponible' : undefined} aria-label={!track.previewUrl ? `Preview no disponible para ${track.title}` : `${active && isPlaying ? 'Pausar' : 'Escuchar'} demo de ${track.title}`}>{active && isPlaying ? <Pause size={large ? 20 : 15} fill="currentColor" /> : <Play size={large ? 20 : 15} fill="currentColor" />}</button>;
 }
 
 function PriceButton({ offer, label = 'Añadir' }: { offer: ProductOffer; label?: string }) {
@@ -292,7 +295,7 @@ function ReleaseCard({ release, featured = false }: { release: Release; featured
 
 function ArtistCard({ artist }: { artist: Artist }) {
   const monogram = artist.name.split(/\s+/).map((part) => part[0]).join('').slice(0, 3);
-  return <Link href={`/artists/${artist.id}`} className="artist-card"><div className="artist-photo">{artist.image ? <img src={artist.image} alt={`Retrato de ${artist.name}`} /> : <div className="artist-photo-placeholder" style={{ '--artist-color': artist.color } as React.CSSProperties} aria-hidden="true"><span>{monogram}</span><small>IMAGEN PENDIENTE</small></div>}</div><p className="card-kicker">{artist.location}</p><h3>{artist.name}</h3><p className="artist-card-bio">{artist.bio}</p>{artist.genres?.length ? <div className="artist-card-genres">{artist.genres.slice(0, 3).map((genre) => <span key={genre}>{genre}</span>)}</div> : null}{artist.highlights?.length ? <p className="artist-card-highlights">{artist.highlights.join(' · ')}</p> : null}<span>Ver perfil <ArrowRight size={14} /></span></Link>;
+  return <Link href={`/artists/${artist.id}`} className="artist-card"><div className="artist-photo">{artist.image ? <ArtistPhoto src={artist.image} alt={`Retrato de ${artist.name}`} /> : <div className="artist-photo-placeholder" style={{ '--artist-color': artist.color } as React.CSSProperties} aria-hidden="true"><span>{monogram}</span></div>}</div>{artist.location && <p className="card-kicker">{artist.location}</p>}<h3>{artist.name}</h3><p className="artist-card-bio">{artist.bio}</p>{artist.genres?.length ? <div className="artist-card-genres">{artist.genres.slice(0, 3).map((genre) => <span key={genre}>{genre}</span>)}</div> : null}{artist.highlights?.length ? <p className="artist-card-highlights">{artist.highlights.join(' · ')}</p> : null}<span>Ver perfil <ArrowRight size={14} /></span></Link>;
 }
 
 function TrackRow({ track, index }: { track: Track; index: number }) {
@@ -318,21 +321,6 @@ export function CartDrawer() {
 }
 
 export function Notice() { const { cartNotice } = useMusic(); return cartNotice ? <div className="toast" role="status"><Check size={16} /> {cartNotice}</div> : null; }
-
-function HomePageLegacy() {
-  const featured = RELEASES[0];
-  const featureTrack = TRACKS[0];
-  const featuredArtist = artistById('lua-mar') || ARTISTS[0];
-  const { playTrack } = useMusic();
-  return <>
-    <section className="hero container"><div className="hero-copy"><p className="hero-lockup"><span>ABRAKADABRA</span><em>/ MUSIC</em></p><p className="eyebrow">01 / Nueva frecuencia · catálogo demo</p><h1>La música<br /><em>también</em> se colecciona.</h1><p className="hero-intro">Escucha el pulso de artistas que están construyendo la próxima noche. Compra directo, guarda lo que encuentres y vuelve cuando quieras.</p><div className="hero-actions"><button className="button button-red" onClick={() => playTrack(featureTrack)}>Escuchar demo <Play size={16} fill="currentColor" /></button><Link href={`/releases/${featured.id}`} className="button button-ghost">Ver lanzamiento <ArrowRight size={16} /></Link></div><p className="hero-note"><span className="signal-dot" /> Preview sintético de demostración · sin reproducción automática</p></div><div className="hero-art"><div className="hero-photo"><div className="hero-art-index">ABK / 001</div><img src={featuredArtist.image || featured.cover} alt={`Retrato editorial demo de ${featuredArtist.name}`} /><span className="hero-photo-caption">LUA MAR · MEDELLÍN</span></div><div className="hero-cover-inset"><img src={featured.cover} alt="Portada demo de Luz de sal" /><span>LUZ DE SAL<br />EP · 2026</span></div></div></section>
-    <section className="signal-strip"><div className="container signal-grid"><span>Escucha</span><i /><span>Explora</span><i /><span>Apoya</span><i /><span>Repite</span><p>ABRAKADABRA MUSIC <small>— una tienda para volver</small></p></div></section>
-    <section className="section container"><SectionHeading eyebrow="02 / El pulso" title="Artistas que dejan señal" link="Ver todos" href="/artists" /><div className="artist-grid">{ARTISTS.slice(0, 4).map((artist) => <ArtistCard key={artist.id} artist={artist} />)}</div></section>
-    <section className="section section-ink"><div className="container"><SectionHeading eyebrow="03 / Recién llegado" title="Lanzamientos para escuchar lento" link="Ver catálogo" href="/releases" /><div className="release-grid">{RELEASES.slice(0, 3).map((release) => <ReleaseCard key={release.id} release={release} />)}</div></div></section>
-    <section className="section container tracks-section"><SectionHeading eyebrow="04 / Selección editorial" title="Una pista abre la puerta" link="Todas las pistas" href="/tracks" /><div className="track-list">{TRACKS.slice(0, 5).map((track, index) => <TrackRow key={track.id} track={track} index={index} />)}</div></section>
-    <section className="editorial container"><div><p className="eyebrow">05 / Nota de escucha</p><h2>Comprar una canción<br /><em>es dejarla existir.</em></h2></div><div><p>Este catálogo semilla es una demostración de la futura tienda de música de Abrakadabra: un lugar con artistas protagonistas, previews autorizados y compras digitales claras.</p><Link href="/account" className="text-link">Conoce tu biblioteca <ArrowRight size={16} /></Link></div></section>
-  </>;
-}
 
 function FeaturedPanel({ release, index, active, onHover }: { release: Release; index: number; active: boolean; onHover: () => void }) {
   const year = release.date ? new Date(release.date).getFullYear() : null;
@@ -360,7 +348,7 @@ function FeaturedGallery() {
   const { catalog, catalogLoading } = useMusic();
   const featuredReleases = [...catalog.releases.filter((release) => release.id === 'solaris'), ...catalog.releases.filter((release) => release.id !== 'solaris')].slice(0, 5);
   return <section className="featured-gallery container" aria-labelledby="featured-gallery-title" onMouseLeave={() => setActiveId('solaris')}>
-    <div className="featured-gallery-heading"><p className="eyebrow" id="featured-gallery-title">01 / Archivo abierto</p><p>{catalogLoading ? 'Cargando catálogo…' : 'Pasa por una portada para entrar.'}</p></div>
+    <div className="featured-gallery-heading"><p className="eyebrow" id="featured-gallery-title">01 / Archivo abierto</p><p>{catalogLoading ? 'Cargando catálogo…' : 'Desliza y toca una portada para abrirla.'}</p></div>
     <div className="featured-gallery-track" role="list" aria-label="Lanzamientos destacados">
       {featuredReleases.map((release, index) => <FeaturedPanel key={release.id} release={release} index={index} active={activeId === release.id} onHover={() => setActiveId(release.id)} />)}
     </div>
@@ -379,20 +367,24 @@ function HomePage() {
     <section className="section container tracks-section"><SectionHeading eyebrow="04 / Selección editorial" title="Una pista abre la puerta" link="Todas las pistas" href="/tracks" /><div className="track-list">{catalog.tracks.slice(0, 5).map((track, index) => <TrackRow key={track.id} track={track} index={index} />)}</div></section>
     <section className="section container"><SectionHeading eyebrow="05 / Artistas para tu evento" title="La música también se vive en directo" link="Ver artistas y contratar" href="/artists#artist-booking" /><div className="artist-grid">{catalog.artists.filter((artist) => artist.hireable).slice(0, 4).map((artist) => <ArtistCard key={artist.id} artist={artist} />)}</div></section>
     <section className="section section-ink"><div className="container"><SectionHeading eyebrow="06 / Más vendidos" title="Lo que ya eligió la gente" link="Ver catálogo" href="/releases" />{popular.length ? <div className="release-grid">{popular.slice(0, 3).map((item) => item && ('trackIds' in item ? <ReleaseCard key={`release-${item.id}`} release={item} /> : <article className="release-card best-seller-track" key={`track-${item.id}`}><TrackRow track={item} index={0} /></article>))}</div> : <p className="honest-empty">Aún no hay compras confirmadas para mostrar como más vendidos.</p>}</div></section>
-    <section className="section container testimonial-section"><p className="eyebrow">07 / Voces de la pista</p><h2>Opiniones de quienes<br /><em>ya lo escucharon.</em></h2><p>Aún no tenemos testimonios verificados para publicar. Cuando recibamos la primera reseña autorizada, aparecerá aquí con el nombre de su autor.</p></section>
-    <section className="editorial container"><div><p className="eyebrow">08 / Licencia de música</p><h2>Escucha, mezcla<br /><em>y respeta la autoría.</em></h2></div><div><p>Consulta las condiciones de uso compartidas para SOLARIS: usos permitidos en eventos y redes, y restricciones para proteger la autoría.</p><Link href="/licencia/solaris" className="text-link">Leer licencia informativa <ArrowRight size={16} /></Link><Link href="/account" className="text-link">Conoce tu biblioteca <ArrowRight size={16} /></Link></div></section>
+    <section className="editorial container"><div><p className="eyebrow">07 / Licencia de SOLARIS</p><h2>El sonido entra.<br /><em>La autoría permanece.</em></h2></div><div><p>Diez canciones completas para DJs, con Extended Mix y portada oficial. Las condiciones permiten tocar la música y compartir sets; los archivos no pueden revenderse ni redistribuirse.</p><Link href="/licencia/solaris" className="text-link">Ver condiciones de uso <ArrowRight size={16} /></Link></div></section>
   </div>;
 }
 
+function SolarisLicensePage() {
+  return <PageFrame eyebrow="SOLARIS / Licencia" title="Condiciones de uso" intro="El pack incluye 10 canciones completas, WAV de 24 bits, Extended Mix para DJs, portada oficial y descarga digital."><section className="license-card"><p className="eyebrow">Usos permitidos</p><ul><li>Tocar la música en eventos y discotecas.</li><li>Publicar sets en YouTube o SoundCloud.</li><li>Compartir fragmentos en Instagram y TikTok.</li></ul><p className="eyebrow">Usos no permitidos</p><ul><li>Revender o redistribuir los tracks.</li><li>Registrar los tracks a nombre propio.</li></ul><p>El precio y los títulos de los 10 tracks se anunciarán cuando estén confirmados.</p><Link href="/releases/solaris" className="text-link">Volver a SOLARIS <ArrowRight size={15} /></Link></section></PageFrame>;
+}
+
 function ArtistBookingForm() {
+  const { catalog } = useMusic();
   const [selectedArtist, setSelectedArtist] = useState('');
   const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [message, setMessage] = useState('');
   useEffect(() => {
     const artistId = new URLSearchParams(window.location.search).get('artist');
-    const artist = ARTISTS.find((item) => item.id === artistId && item.hireable);
+    const artist = catalog.artists.find((item) => item.id === artistId && item.hireable);
     if (artist) setSelectedArtist(artist.name);
-  }, []);
+  }, [catalog.artists]);
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setState('sending'); setMessage('');
@@ -408,11 +400,7 @@ function ArtistBookingForm() {
       formElement.reset(); setSelectedArtist('');
     } catch (error) { setState('error'); setMessage(error instanceof Error ? error.message : 'No se pudo enviar la solicitud.'); }
   };
-  return <section className="artist-booking" id="artist-booking"><div><p className="eyebrow">Contrataciones / Artistas</p><h2>Cuéntanos sobre<br /><em>tu evento.</em></h2><p>Solicita disponibilidad de un artista. Esta solicitud no confirma una reserva ni fija un precio; el equipo se pondrá en contacto contigo.</p></div><form className="artist-booking-form" onSubmit={submit}><label>Nombre completo<input name="full_name" required minLength={2} autoComplete="name" /></label><label>Correo electrónico<input name="email" type="email" required autoComplete="email" /></label><div className="form-row"><label>Código de país<input name="country_code" type="tel" required pattern="\+\d{1,6}" defaultValue="+57" /></label><label>Teléfono<input name="phone" type="tel" required minLength={4} autoComplete="tel" /></label></div><label>Artista<select name="artist" value={selectedArtist} onChange={(event) => setSelectedArtist(event.target.value)}><option value="">Elige o solicita una recomendación</option>{ARTISTS.filter((artist) => artist.hireable).map((artist) => <option key={artist.id} value={artist.name}>{artist.name}</option>)}</select></label><div className="form-row"><label>Lugar del evento<input name="place" required /></label><label>Fecha aproximada<input name="date" type="date" required /></label></div><div className="form-row"><label>Tipo de evento<input name="event_type" required placeholder="Festival, club, evento privado…" /></label><label>Visibilidad<select name="visibility" defaultValue="private"><option value="private">Privado</option><option value="public">Público</option></select></label></div><div className="form-row"><label>Duración de la presentación<input name="hours" required placeholder="Ej. 2 horas" /></label><label>Asistencia aproximada<input name="guests" placeholder="Opcional" /></label></div><label>Detalles del evento<textarea name="details" rows={4} maxLength={4000} placeholder="Cuéntanos el horario, el tipo de público u otros requisitos." /></label>{message && <p className={state === 'error' ? 'form-error' : 'form-success'} role={state === 'error' ? 'alert' : 'status'}>{message}</p>}<button className="button button-red" type="submit" disabled={state === 'sending'}>{state === 'sending' ? 'Enviando solicitud…' : 'Enviar solicitud'} <ArrowRight size={15} /></button></form></section>;
-}
-
-function SolarisLicensePage() {
-  return <PageFrame eyebrow="SOLARIS / Licencia informativa" title="Condiciones de uso" intro="Resumen de las condiciones compartidas para el álbum SOLARIS. No es un contrato personalizado ni sustituye los términos finales de compra."><section className="license-card"><p className="eyebrow">Usos permitidos</p><ul><li>Reproducir la música en eventos, clubes y discotecas.</li><li>Publicar sets que incluyan estas canciones en YouTube o SoundCloud.</li><li>Compartir fragmentos en Instagram y TikTok.</li></ul><p className="eyebrow">Usos no permitidos</p><ul><li>Revender o redistribuir las pistas originales.</li><li>Registrar las obras a nombre propio.</li><li>Afirmar autoría o propiedad sobre la música.</li></ul><p>Los archivos completos, tracklist definitivo, precio, vendedor legal y documento final de licencia se añadirán cuando estén confirmados.</p><Link href="/releases/solaris" className="text-link">Volver a SOLARIS <ArrowRight size={15} /></Link></section></PageFrame>;
+  return <section className="artist-booking" id="artist-booking"><div><p className="eyebrow">Contrataciones / Artistas</p><h2>Cuéntanos sobre<br /><em>tu evento.</em></h2><p>Solicita disponibilidad de un artista. Esta solicitud no confirma una reserva ni fija un precio; el equipo se pondrá en contacto contigo.</p></div><form className="artist-booking-form" onSubmit={submit}><label>Nombre completo<input name="full_name" required minLength={2} autoComplete="name" /></label><label>Correo electrónico<input name="email" type="email" required autoComplete="email" /></label><div className="form-row"><label>Código de país<input name="country_code" type="tel" required pattern="\+\d{1,6}" defaultValue="+57" /></label><label>Teléfono<input name="phone" type="tel" required minLength={4} autoComplete="tel" /></label></div><label>Artista<select name="artist" value={selectedArtist} onChange={(event) => setSelectedArtist(event.target.value)}><option value="">Elige o solicita una recomendación</option>{catalog.artists.filter((artist) => artist.hireable).map((artist) => <option key={artist.id} value={artist.name}>{artist.name}</option>)}</select></label><div className="form-row"><label>Lugar del evento<input name="place" required /></label><label>Fecha aproximada<input name="date" type="date" required /></label></div><div className="form-row"><label>Tipo de evento<input name="event_type" required placeholder="Festival, club, evento privado…" /></label><label>Visibilidad<select name="visibility" defaultValue="private"><option value="private">Privado</option><option value="public">Público</option></select></label></div><div className="form-row"><label>Duración de la presentación<input name="hours" required placeholder="Ej. 2 horas" /></label><label>Asistencia aproximada<input name="guests" placeholder="Opcional" /></label></div><label>Detalles del evento<textarea name="details" rows={4} maxLength={4000} placeholder="Cuéntanos el horario, el tipo de público u otros requisitos." /></label>{message && <p className={state === 'error' ? 'form-error' : 'form-success'} role={state === 'error' ? 'alert' : 'status'}>{message}</p>}<button className="button button-red" type="submit" disabled={state === 'sending'}>{state === 'sending' ? 'Enviando solicitud…' : 'Enviar solicitud'} <ArrowRight size={15} /></button></form></section>;
 }
 
 function ArtistsPage() {
@@ -430,7 +418,19 @@ function ArtistsPage() {
 
 function ReleasesPage() { const [filter, setFilter] = useState('Todos'); const { catalog } = useMusic(); const filtered = filter === 'Todos' ? catalog.releases : catalog.releases.filter((release) => release.type === filter); return <div className="releases-page-shell"><PageFrame eyebrow="03 / Catálogo" title="Lanzamientos" intro="Álbumes, EP y sencillos para llevarte la frecuencia completa."><div className="filter-row"><div className="filter-tabs">{['Todos', 'Álbum', 'EP', 'Sencillo'].map((item) => <button key={item} className={filter === item ? 'selected' : ''} onClick={() => setFilter(item)}>{item}</button>)}</div><span><SlidersHorizontal size={15} /> Orden: recientes</span></div><div className="release-grid release-grid-large">{filtered.map((release) => <ReleaseCard key={release.id} release={release} />)}</div></PageFrame></div>; }
 
-function TracksPage() { const { catalog } = useMusic(); return <div className="tracks-page-shell"><PageFrame eyebrow="04 / Pistas" title="Pistas" intro="La entrada más pequeña a un universo completo. Escucha el preview y compra la pista si está disponible individualmente."><div className="track-list track-list-full">{catalog.tracks.map((track, index) => <TrackRow key={track.id} track={track} index={index} />)}</div></PageFrame></div>; }
+function TracksPage() {
+  const { catalog } = useMusic();
+  const [genre, setGenre] = useState('Todos');
+  const genres = Array.from(new Set(catalog.tracks.flatMap((track) => [
+    ...(track.genre ? [track.genre] : []),
+    ...track.artistIds.flatMap((artistId) => catalog.artists.find((artist) => artist.id === artistId)?.genres || []),
+  ]))).sort((a, b) => a.localeCompare(b, 'es'));
+  const filtered = genre === 'Todos' ? catalog.tracks : catalog.tracks.filter((track) =>
+    track.genre === genre || track.artistIds.some((artistId) => catalog.artists.find((artist) => artist.id === artistId)?.genres?.includes(genre)),
+  );
+
+  return <div className="tracks-page-shell"><PageFrame eyebrow="04 / Pistas" title="Pistas" intro="Escucha previews de las canciones publicadas en el catálogo."><div className="filter-row track-genre-filters"><div className="filter-tabs" role="group" aria-label="Filtrar canciones por género">{['Todos', ...genres].map((item) => <button type="button" key={item} className={genre === item ? 'selected' : ''} aria-pressed={genre === item} onClick={() => setGenre(item)}>{item}</button>)}</div><span>{filtered.length} {filtered.length === 1 ? 'canción' : 'canciones'}</span></div><div className="track-list track-list-full">{filtered.length ? filtered.map((track, index) => <TrackRow key={track.id} track={track} index={index} />) : <EmptySearch label={`Todavía no hay canciones de ${genre}.`} />}</div></PageFrame></div>;
+}
 
 function SearchPage() {
   type SearchFilter = 'all' | 'album' | 'track' | 'artist';
@@ -462,60 +462,61 @@ function ArtistReleaseCard({ release }: { release: Release }) {
 
 function ArtistPage({ id }: { id: string }) {
   const { catalog } = useMusic();
-  const artist = catalog.artists.find((item) => item.id === id) || catalog.artists[0];
-  const releases = catalog.releases.filter((release) => release.artistIds.includes(artist.id));
-  const tracks = catalog.tracks.filter((track) => track.artistIds.includes(artist.id));
+  const artist = catalog.artists.find((item) => item.id === id);
+  const releases = artist ? catalog.releases.filter((release) => release.artistIds.includes(artist.id)) : [];
+  const tracks = artist ? catalog.tracks.filter((track) => track.artistIds.includes(artist.id)) : [];
   const firstTrack = tracks[0];
   const [filter, setFilter] = useState('Todos');
   const filteredReleases = filter === 'Todos' ? releases : releases.filter((release) => release.type === filter);
   const releaseCounts = (['Álbum', 'EP', 'Sencillo'] as Release['type'][])
     .map((type) => ({ type, count: releases.filter((release) => release.type === type).length }))
     .filter(({ count }) => count > 0);
-  const catalogFacts = tracks.length ? [`${String(tracks.length).padStart(2, '0')} ${tracks.length === 1 ? 'canción en la tienda' : 'canciones en la tienda'}`] : artist.links?.length ? ['Escucha en plataformas'] : [];
-  const coverFacts = [...(artist.genres || []), ...(artist.highlights || []), ...catalogFacts, ...releaseCounts.map(({ type, count }) => `${String(count).padStart(2, '0')} ${type === 'Sencillo' ? (count === 1 ? 'sencillo' : 'sencillos') : type === 'Álbum' ? (count === 1 ? 'álbum' : 'álbumes') : 'EP'}`)].join(' · ');
-  const initials = artist.name.split(' ').map((word) => word[0]).join('');
-  const listeningLink = artist.links?.find((link) => ['Spotify', 'Apple Music', 'Beatport', 'SoundCloud', 'Traxsource'].includes(link.label));
+  const listeningLink = artist?.links?.find((link) => ['Spotify', 'Apple Music', 'Beatport', 'SoundCloud', 'Traxsource'].includes(link.label));
+  const catalogFacts = tracks.length ? [`${String(tracks.length).padStart(2, '0')} ${tracks.length === 1 ? 'canción en la tienda' : 'canciones en la tienda'}`] : listeningLink ? ['Escucha en plataformas'] : [];
+  const coverFacts = artist ? [...(artist.genres || []), ...(artist.highlights || []), ...catalogFacts, ...releaseCounts.map(({ type, count }) => `${String(count).padStart(2, '0')} ${type === 'Sencillo' ? (count === 1 ? 'sencillo' : 'sencillos') : type === 'Álbum' ? (count === 1 ? 'álbum' : 'álbumes') : 'EP'}`)].join(' · ') : '';
+  const initials = artist?.name.split(' ').map((word) => word[0]).join('') || '';
   const { playTrack } = useMusic();
-  const titleWords = artist.name.split(' ');
+  const titleWords = artist?.name.split(' ') || [];
+  if (!artist) return <PageFrame eyebrow="Artistas" title="Artista no encontrado" intro="Este perfil no está publicado en el catálogo." />;
   return <div className="artist-editorial">
     <section className="artist-cover" data-reveal="cover">
       <div className="artist-cover-frame">
         <div className="artist-cover-media">
-          {artist.image ? <img src={artist.image} style={{ '--artist-position': artist.imagePosition || 'center', '--artist-position-mobile': artist.imagePositionMobile || artist.imagePosition || 'center' } as React.CSSProperties} alt={`Fotografía editorial de ${artist.name}`} /> : <div className="profile-fallback" style={{ background: `linear-gradient(135deg, ${artist.color}, #11100f 82%)` }} aria-hidden="true" />}
+          {artist.image ? <ArtistPhoto src={artist.image} priority style={{ '--artist-position': artist.imagePosition || 'center', '--artist-position-mobile': artist.imagePositionMobile || artist.imagePosition || 'center' } as React.CSSProperties} alt={`Fotografía de ${artist.name}`} /> : <div className="profile-fallback" style={{ background: `linear-gradient(135deg, ${artist.color}, #11100f 82%)` }} aria-hidden="true" />}
         </div>
         <div className="artist-cover-wash" />
         <div className="artist-cover-content">
-          <p className="artist-cover-origin">{artist.location}</p>
+          {artist.location && <p className="artist-cover-origin">{artist.location}</p>}
           <h1 aria-label={artist.name}>{titleWords.map((word, index) => <span className="artist-title-line" key={`${word}-${index}`}><span>{word}</span></span>)}</h1>
           <p className="artist-cover-facts">{coverFacts}</p>
-          <div className="artist-actions">{firstTrack ? <button className="button button-red" onClick={() => playTrack(firstTrack)}><Play size={15} fill="currentColor" /> Escuchar demo</button> : listeningLink ? <a href={listeningLink.url} className="button button-red" target="_blank" rel="noreferrer">Escuchar en {listeningLink.label} ↗</a> : null}<a href="#discografia" className="button button-outline">Explorar música <ArrowRight size={15} /></a>{artist.hireable && <Link href={`/artists?artist=${artist.id}#artist-booking`} className="button button-outline">Consultar disponibilidad <ArrowRight size={15} /></Link>}</div>
+          <div className="artist-actions">{firstTrack?.previewUrl ? <button className="button button-red" onClick={() => playTrack(firstTrack)}><Play size={15} fill="currentColor" /> Escuchar demo</button> : listeningLink ? <a href={listeningLink.url} className="button button-red" target="_blank" rel="noreferrer">Escuchar en {listeningLink.label} ↗</a> : null}<a href="#discografia" className="button button-outline">Explorar música <ArrowRight size={15} /></a>{artist.hireable && <Link href={`/artists?artist=${artist.id}#artist-booking`} className="button button-outline">Consultar disponibilidad <ArrowRight size={15} /></Link>}</div>
         </div>
       </div>
     </section>
     <section className="artist-discography container" id="discografia" data-reveal="section"><div className="artist-discography-heading"><div><p className="eyebrow">01 / Discografía</p><h2>Lanzamientos</h2><p>Álbumes, EP y sencillos para escuchar, explorar y comprar.</p></div><Link href="/releases" className="text-link">Ver catálogo <ArrowRight size={15} /></Link></div><div className="artist-filter-row" role="tablist" aria-label="Filtrar discografía">{['Todos', 'Álbum', 'EP', 'Sencillo'].map((item) => <button key={item} role="tab" aria-selected={filter === item} className={filter === item ? 'selected' : ''} onClick={() => setFilter(item)}>{item === 'Todos' ? 'Todos' : `${item}${item === 'Álbum' ? 'es' : item === 'Sencillo' ? 's' : ''}`}</button>)}</div>{filteredReleases.length ? <div className="artist-release-grid">{filteredReleases.map((release) => <ArtistReleaseCard key={release.id} release={release} />)}</div> : <div className="artist-profile-empty"><h3>Aún no hay lanzamientos en la tienda.</h3><p>Consulta los enlaces oficiales del artista para escuchar sus publicaciones.</p>{artist.links?.length ? <nav className="artist-social-links" aria-label={`Plataformas de ${artist.name}`}>{artist.links.map((link) => <a key={link.label} href={link.url} target="_blank" rel="noreferrer">{link.label} ↗</a>)}</nav> : null}</div>}</section>
     {tracks.length > 0 && <section className="artist-recordings container" data-reveal="section"><SectionHeading eyebrow="02 / Grabaciones" title="Pistas para entrar" /><div className="track-list">{tracks.map((track, index) => <TrackRow key={track.id} track={track} index={index} />)}</div></section>}
-    <section className="artist-story container" data-reveal="section"><div><p className="eyebrow">03 / Historia y archivo</p><h2>La noche también<br /><em>deja registro.</em></h2></div><div><p>{artist.story || artist.bio}</p>{artist.links?.length ? <nav className="artist-social-links" aria-label={`Enlaces de ${artist.name}`}>{artist.links.map((link) => <a key={link.label} href={link.url} target="_blank" rel="noreferrer">{link.label} ↗</a>)}</nav> : null}{artist.gallery?.length ? <div className="artist-gallery">{artist.gallery.map((image) => <img key={image} src={image} alt={`Archivo de ${artist.name}`} />)}</div> : !artist.image ? <div className="asset-note"><span>Archivo visual pendiente</span><p>Se añadirá una galería cuando haya fotos adicionales autorizadas.</p></div> : null}</div></section>
+    <section className="artist-story container" data-reveal="section"><div><p className="eyebrow">03 / Historia y archivo</p><h2>La noche también<br /><em>deja registro.</em></h2></div><div><p>{artist.story || artist.bio}</p>{artist.links?.length ? <nav className="artist-social-links" aria-label={`Enlaces de ${artist.name}`}>{artist.links.map((link) => <a key={link.label} href={link.url} target="_blank" rel="noreferrer">{link.label} ↗</a>)}</nav> : null}{artist.gallery?.length ? <div className="artist-gallery">{artist.gallery.map((image) => <img key={image} src={image} alt={`Archivo de ${artist.name}`} />)}</div> : null}</div></section>
   </div>;
 }
 
 function ReleasePage({ id }: { id: string }) {
   const { catalog } = useMusic();
-  const release = catalog.releases.find((item) => item.id === id) || catalog.releases[0];
+  const release = catalog.releases.find((item) => item.id === id);
   const tracks = release ? release.trackIds.map((trackId) => catalog.tracks.find((track) => track.id === trackId)).filter(Boolean) as Track[] : [];
   const { playTrack } = useMusic();
   if (!release) return <PageFrame eyebrow="03 / Catálogo" title="Sin lanzamientos" intro="Todavía no hay contenido publicado."><EmptySearch label="El catálogo está esperando su primera publicación." /></PageFrame>;
   return <div className="release-page-shell"><PageFrame eyebrow={`Lanzamiento / ${release.type}`} title={release.title} intro={release.description}>
-    <div className="release-detail"><AlbumVinylArtwork className="release-detail-artwork" cover={release.cover} title={release.title} size="detail" coverFit={release.id === 'solaris' ? 'contain' : 'cover'} /><div className="release-detail-copy"><p className="card-kicker">{artistName(release.artistIds, catalog.artists)}{release.date ? ` · ${release.date}` : release.comingSoon ? ' · Pack digital' : ' · Demo'}</p><h2>{release.comingSoon ? 'Diez tracks para la cabina.' : 'Una obra para escuchar completa.'}</h2><p>{release.comingSoon ? 'Una colección de 8BATZZ y Esteban Arenas pensada para DJs. El pack se publicará cuando estén listos el tracklist y los datos de compra.' : release.demoOnly ? 'Demo de escucha. No está disponible para compra.' : `Incluye ${tracks.length} grabaciones. El precio del conjunto es independiente de la suma de las pistas.`}</p>{release.comingSoon ? <span className="coming-soon-label">Próximamente · precio por anunciar</span> : !release.demoOnly && <PriceButton offer={releaseOffer(release, catalog.artists)} label="Añadir lanzamiento" />}{!release.comingSoon && <button className="text-link plain-button" onClick={() => { const track = tracks[0]; if (track) playTrack(track); }}>Escuchar {release.demoOnly ? 'demo' : 'primer preview'} <Play size={16} /></button>}</div></div>
-    {release.comingSoon && release.packageDetails && <section className="release-package-details"><div><p className="eyebrow">El pack</p><h2>Sonido completo.<br /><em>Listo para mezclar.</em></h2></div><div><ul>{release.packageDetails.map((item) => <li key={item}>{item}</li>)}</ul><h3>Licencia de uso</h3><ul className="release-license-list">{release.licenseTerms?.map((item) => <li key={item}>{item}</li>)}</ul><p className="release-package-note">El precio y los nombres de las 10 pistas se anunciarán antes de habilitar la compra.</p></div></section>}
+    <div className="release-detail"><AlbumVinylArtwork className="release-detail-artwork" cover={release.cover} title={release.title} size="detail" coverFit={release.id === 'solaris' ? 'contain' : 'cover'} /><div className="release-detail-copy"><p className="card-kicker">{artistName(release.artistIds, catalog.artists)}{release.date ? ` · ${release.date}` : release.comingSoon ? ' · Pack digital' : ' · Demo'}</p><h2>{release.comingSoon ? 'Diez tracks para la cabina.' : 'Una obra para escuchar completa.'}</h2><p>{release.comingSoon ? `Una colección de ${release.trackCount} tracks de 8BATZZ y Esteban Arenas pensada para DJs. Los títulos se publicarán cuando el tracklist esté confirmado.` : release.demoOnly ? 'Demo de escucha. No está disponible para compra.' : `Incluye ${tracks.length} grabaciones. El precio del conjunto es independiente de la suma de las pistas.`}</p>{release.comingSoon ? <span className="coming-soon-label">Próximamente · precio por anunciar</span> : !release.demoOnly && <PriceButton offer={releaseOffer(release, catalog.artists)} label="Añadir lanzamiento" />}{!release.comingSoon && tracks[0]?.previewUrl && <button className="text-link plain-button" onClick={() => { const track = tracks[0]; if (track) playTrack(track); }}>Escuchar demo <Play size={16} /></button>}</div></div>
+    {release.comingSoon && release.packageDetails && <section className="release-package-details"><div><p className="eyebrow">El pack</p><h2>Diez canciones<br /><em>listas para mezclar.</em></h2></div><div><ul>{release.packageDetails.map((item) => <li key={item}>{item}</li>)}</ul><h3>Licencia de uso</h3><ul className="release-license-list">{release.licenseTerms?.map((item) => <li key={item}>{item}</li>)}</ul><p className="release-package-note">El precio y los títulos de los 10 tracks aún no se han publicado.</p></div></section>}
     {release.comingSoon ? <section className="tracklist-detail release-tracklist-pending"><div className="detail-heading"><p className="eyebrow">Tracklist</p><span>{release.trackCount} pistas</span></div><p>Los títulos y previews se añadirán cuando estén definidos para publicación.</p></section> : <div className="tracklist-detail"><div className="detail-heading"><p className="eyebrow">Tracklist</p><span>{tracks.length} pistas · {release.type}</span></div>{tracks.map((track, index) => <TrackRow key={track.id} track={track} index={index} />)}</div>}
   </PageFrame></div>;
 }
 
 function TrackPage({ id }: { id: string }) {
   const { catalog, activeTrack, isPlaying, audioAnalyser, progress, duration, playTrack, seekTo, togglePlayback } = useMusic();
-  const track = catalog.tracks.find((item) => item.id === id) || catalog.tracks[0];
+  const track = catalog.tracks.find((item) => item.id === id);
   const release = track ? catalog.releases.find((item) => item.id === track.releaseId) : undefined;
-  if (!track) return <PageFrame eyebrow="04 / Pistas" title="Sin pistas" intro="Todavía no hay contenido publicado."><EmptySearch label="El catálogo está esperando su primera pista." /></PageFrame>;
+  if (!track) return <PageFrame eyebrow="04 / Pistas" title="Canción no encontrada" intro="Esta canción no está publicada en el catálogo."><Link href="/tracks" className="text-link">Ver canciones <ArrowRight size={16} /></Link></PageFrame>;
   const isCurrentTrack = activeTrack?.id === track.id;
 
   return <div className="track-page-shell"><div className="track-page container">
@@ -714,7 +715,7 @@ function ArtistApplicationPage() {
     {isArtist && <div className="application-status-card application-approved"><span className="application-status-icon"><Check /></span><div><p className="eyebrow">Estado actual</p><h2>Artista aprobado</h2><p>Ya formas parte del equipo de artistas. No es necesario que hagas más postulaciones.</p><Link className="button button-red" href="/account/artist">Abrir Studio de artista <ArrowRight size={16} /></Link></div></div>}
     {!isArtist && latest && <div className={`application-status-card application-${latest.status}`}><span className="application-status-icon">{latest.status === 'rejected' ? <X /> : latest.status === 'approved' ? <Check /> : <Clock3 />}</span><div><p className="eyebrow">Última postulación · {applicationStatusLabel(latest.status)}</p><h2>{latest.status === 'approved' ? 'Aprobación pendiente de activación' : latest.status === 'rejected' ? 'Puedes volver a intentarlo' : latest.status === 'needs_info' ? 'Necesitamos más información' : 'Tu proyecto está en revisión'}</h2><p>{latest.review_notes || (latest.status === 'approved' ? 'La solicitud está aprobada, pero el rol de artista todavía no se ha sincronizado. Actualiza tu sesión o contacta al administrador.' : latest.status === 'rejected' ? 'Revisa el detalle de esta solicitud y espera a que se abra tu siguiente periodo mensual.' : 'Recibimos tus datos. El equipo revisará tu proyecto y te avisará qué sigue.')}</p></div></div>}
     {!isArtist && !canApply && <div className="application-limit-note"><Clock3 size={17} /><p>{hasActiveApplication ? 'Ya tienes una postulación activa. No puedes enviar otra hasta que el equipo la resuelva.' : 'Ya enviaste una postulación este mes. Podrás enviar otra cuando comience el próximo mes.'}</p></div>}
-    {canApply && <><div className="application-progress"><span className="active">01 <b>Tu proyecto</b></span><i /><span className="active">02 <b>Revisión</b></span><i /><span>03 <b>Studio</b></span></div>{error && <p className="form-error" role="alert">{error}</p>}<form className="artist-application-form" onSubmit={submit}><div className="application-form-heading"><div><p className="eyebrow">Información básica</p><h2>Tu identidad artística</h2></div><span>Solo puedes enviar una postulación por mes.</span></div><div className="form-row"><label htmlFor="application-artist-name">Nombre artístico<input id="application-artist-name" required value={form.artist_name} onChange={(event) => setForm((current) => ({ ...current, artist_name: event.target.value }))} placeholder="Ej. Lua Mar" /></label><label htmlFor="application-country">País<input id="application-country" required value={form.country} onChange={(event) => setForm((current) => ({ ...current, country: event.target.value }))} placeholder="Colombia" /></label></div><div className="form-row form-row-phone"><label htmlFor="application-phone-code">Código<input id="application-phone-code" required value={form.phone_country_code} onChange={(event) => setForm((current) => ({ ...current, phone_country_code: event.target.value }))} placeholder="+57" /></label><label htmlFor="application-phone">Número de teléfono<input id="application-phone" type="tel" required value={form.phone_number} onChange={(event) => setForm((current) => ({ ...current, phone_number: event.target.value }))} placeholder="300 000 0000" /></label><label htmlFor="application-email">Correo de cuenta<input id="application-email" type="email" value={musicUser.email} readOnly /></label></div><label htmlFor="application-instagram">Instagram o enlace principal<span>Si tienes otros enlaces, puedes agregarlos en la descripción.</span><input id="application-instagram" type="url" required value={form.instagram_url} onChange={(event) => setForm((current) => ({ ...current, instagram_url: event.target.value }))} placeholder="https://instagram.com/tu-proyecto" /></label><label htmlFor="application-motivation">¿Por qué quieres vender tu música aquí?<span>Cuéntanos qué estás construyendo y qué esperas encontrar en Abrakadabra.</span><textarea id="application-motivation" required minLength={30} rows={5} value={form.motivation} onChange={(event) => setForm((current) => ({ ...current, motivation: event.target.value }))} placeholder="Quiero compartir…" /></label><label htmlFor="application-experience">¿Dónde has estado o qué has publicado?<span>Incluye presentaciones, proyectos, colaboraciones, enlaces o experiencias relevantes.</span><textarea id="application-experience" required minLength={20} rows={5} value={form.experience} onChange={(event) => setForm((current) => ({ ...current, experience: event.target.value }))} placeholder="He participado en…" /></label><div className="application-form-footer"><p><Check size={16} /> Revisamos cada proyecto de forma humana.</p><button className="button button-red" disabled={saving} type="submit">{saving ? 'Enviando postulación…' : 'Enviar para revisión'} <ArrowRight size={16} /></button></div></form></>}
+    {canApply && <><div className="application-progress"><span className="active">01 <b>Tu proyecto</b></span><i /><span className="active">02 <b>Revisión</b></span><i /><span>03 <b>Studio</b></span></div>{error && <p className="form-error" role="alert">{error}</p>}<form className="artist-application-form" onSubmit={submit}><div className="application-form-heading"><div><p className="eyebrow">Información básica</p><h2>Tu identidad artística</h2></div><span>Solo puedes enviar una postulación por mes.</span></div><div className="form-row"><label htmlFor="application-artist-name">Nombre artístico<input id="application-artist-name" required value={form.artist_name} onChange={(event) => setForm((current) => ({ ...current, artist_name: event.target.value }))} placeholder="Nombre artístico" /></label><label htmlFor="application-country">País<input id="application-country" required value={form.country} onChange={(event) => setForm((current) => ({ ...current, country: event.target.value }))} placeholder="Colombia" /></label></div><div className="form-row form-row-phone"><label htmlFor="application-phone-code">Código<input id="application-phone-code" required value={form.phone_country_code} onChange={(event) => setForm((current) => ({ ...current, phone_country_code: event.target.value }))} placeholder="+57" /></label><label htmlFor="application-phone">Número de teléfono<input id="application-phone" type="tel" required value={form.phone_number} onChange={(event) => setForm((current) => ({ ...current, phone_number: event.target.value }))} placeholder="300 000 0000" /></label><label htmlFor="application-email">Correo de cuenta<input id="application-email" type="email" value={musicUser.email} readOnly /></label></div><label htmlFor="application-instagram">Instagram o enlace principal<span>Si tienes otros enlaces, puedes agregarlos en la descripción.</span><input id="application-instagram" type="url" required value={form.instagram_url} onChange={(event) => setForm((current) => ({ ...current, instagram_url: event.target.value }))} placeholder="https://instagram.com/tu-proyecto" /></label><label htmlFor="application-motivation">¿Por qué quieres vender tu música aquí?<span>Cuéntanos qué estás construyendo y qué esperas encontrar en Abrakadabra.</span><textarea id="application-motivation" required minLength={30} rows={5} value={form.motivation} onChange={(event) => setForm((current) => ({ ...current, motivation: event.target.value }))} placeholder="Quiero compartir…" /></label><label htmlFor="application-experience">¿Dónde has estado o qué has publicado?<span>Incluye presentaciones, proyectos, colaboraciones, enlaces o experiencias relevantes.</span><textarea id="application-experience" required minLength={20} rows={5} value={form.experience} onChange={(event) => setForm((current) => ({ ...current, experience: event.target.value }))} placeholder="He participado en…" /></label><div className="application-form-footer"><p><Check size={16} /> Revisamos cada proyecto de forma humana.</p><button className="button button-red" disabled={saving} type="submit">{saving ? 'Enviando postulación…' : 'Enviar para revisión'} <ArrowRight size={16} /></button></div></form></>}
     <div className="application-history"><div className="application-history-heading"><div><p className="eyebrow">Historial</p><h2>Postulaciones que has enviado</h2></div><span>{applications.length} {applications.length === 1 ? 'solicitud' : 'solicitudes'}</span></div>{applications.length === 0 ? <div className="empty-state small"><Music2 size={24} /><h3>Aún no hay postulaciones.</h3><p>Cuando quieras presentar tu proyecto, completa el formulario de esta página.</p></div> : <div className="application-history-list">{applications.map((item) => <article key={item.id} className={`application-history-item application-${item.status}`}><div><p className="eyebrow">{applicationDateLabel(item.created_at)}</p><h3>{item.artist_name}</h3><p>{item.country} · {item.phone_country_code} {item.phone_number}</p><a href={item.instagram_url} target="_blank" rel="noreferrer">{item.instagram_url}</a></div><span className="application-badge">{applicationStatusLabel(item.status)}</span></article>)}</div>}</div>
   </PageFrame></div>;
 }
@@ -848,17 +849,16 @@ function PageFrame({ eyebrow, title, intro, children }: { eyebrow: string; title
 function EmptySearch({ label }: { label: string }) { return <div className="empty-search"><Search size={24} /><h3>{label}</h3><p>Prueba con el nombre de un artista, un lanzamiento o una pista del catálogo demo.</p><Link href="/releases" className="text-link">Ver lanzamientos <ArrowRight size={16} /></Link></div>; }
 
 export function RouteContent({ route }: { route: string }) {
-  const { catalog } = useMusic();
   const parts = route.split('/').filter(Boolean);
   if (!route) return <HomePage />;
   if (route === 'artists') return <ArtistsPage />;
   if (route === 'djs') return <ArtistsPage />;
   if (route === 'licencia/solaris') return <SolarisLicensePage />;
-  if (parts[0] === 'artists') return <ArtistPage id={parts[1] || catalog.artists[0]?.id || ARTISTS[0].id} />;
+  if (parts[0] === 'artists') return <ArtistPage id={parts[1] || ''} />;
   if (route === 'releases') return <ReleasesPage />;
-  if (parts[0] === 'releases') return <ReleasePage id={parts[1] || catalog.releases[0]?.id || RELEASES[0].id} />;
+  if (parts[0] === 'releases') return <ReleasePage id={parts[1] || ''} />;
   if (route === 'tracks') return <TracksPage />;
-  if (parts[0] === 'tracks') return <TrackPage id={parts[1] || catalog.tracks[0]?.id || TRACKS[0].id} />;
+  if (parts[0] === 'tracks') return <TrackPage id={parts[1] || ''} />;
   if (route === 'search') return <SearchPage />;
   if (route === 'account/artist-application') return <ArtistApplicationPage />;
   if (route === 'account/applications') return <ArtistApplicationPage />;
