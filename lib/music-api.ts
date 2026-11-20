@@ -83,14 +83,21 @@ export async function fetchMusicCatalog(): Promise<MusicCatalog | null> {
 
     if (!artists.length && !releases.length && !tracks.length) return null;
 
-    const artistModels = artists.map((artist, index) => ({
-      id: artist.id,
-      name: artist.name,
-      location: artist.location || 'Abrakadabra Music',
-      bio: artist.biography || 'Artista del catálogo Abrakadabra Music.',
-      color: fallbackColors[index % fallbackColors.length],
-      image: artist.image_url || undefined,
-    }));
+    const normalizeArtistName = (name: string) => name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase().replace(/^dj\s+/, '').replace(/\s*\(col\)$/, '').replace(/\s+vibes$/, '');
+    const artistModels: Artist[] = artists.map((artist, index) => {
+      const localProfile = ARTISTS.find((item) => normalizeArtistName(item.name) === normalizeArtistName(artist.name));
+      return {
+        ...localProfile,
+        id: artist.id,
+        name: artist.name,
+        location: artist.location || localProfile?.location || 'Abrakadabra Music',
+        bio: artist.biography || localProfile?.bio || 'Artista del catálogo Abrakadabra Music.',
+        color: localProfile?.color || fallbackColors[index % fallbackColors.length],
+        image: artist.image_url || localProfile?.image,
+      } satisfies Artist;
+    });
+    const remoteArtistNames = new Set(artists.map((artist) => normalizeArtistName(artist.name)));
+    artistModels.push(...ARTISTS.filter((artist) => !remoteArtistNames.has(normalizeArtistName(artist.name))));
     const artistById = new Map(artistModels.map((artist) => [artist.id, artist]));
 
     const releaseModels = releases.map((release) => {

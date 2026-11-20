@@ -12,6 +12,7 @@ export type Artist = {
   links?: Array<{ label: string; url: string }>;
   genres?: string[];
   hireable?: boolean;
+  highlights?: string[];
 };
 
 export type Track = {
@@ -66,7 +67,7 @@ export const ARTISTS: Artist[] = [
     id: '8batzz', name: '8BATZZ', location: 'Pereira, Colombia',
     bio: 'DJ y productor colombiano de House, Tech House y Afro House. Combina grooves profundos, percusión orgánica y atmósferas hipnóticas para convertir la música en conexión.',
     color: '#cf4c38', image: '/artists/djs/8batzz.png', imagePosition: '50% 22%',
-    imagePositionMobile: '50% 20%', gallery: [],
+    imagePositionMobile: '50% 20%', gallery: [], genres: ['Afro House', 'Tech House', 'Afro Melodic'], hireable: true,
     story: 'Nacido en Pereira, 8BATZZ encontró en la música una herramienta de transformación personal. Su curiosidad por las vibraciones del sonido y el desarrollo personal dio forma a una identidad que conecta grooves profundos, percusión orgánica y atmósferas creadas para la pista. Como DJ ha llevado su propuesta a escenarios de Miami y Nueva York, incluidos MITA y La Escena. En SOLARIS comparte una selección junto a Esteban Arenas.',
     links: [
       { label: 'Instagram', url: 'https://www.instagram.com/8batzz/' },
@@ -78,8 +79,8 @@ export const ARTISTS: Artist[] = [
     id: 'esteban-arenas', name: 'Esteban Arenas', location: 'Medellín, Colombia',
     bio: 'DJ y productor colombiano con una propuesta que cruza Afro House, Tech House y Groove House: grooves precisos, percusión orgánica y energía para la pista.',
     color: '#bb9a5e', image: '/artists/djs/esteban-arenas.png', imagePosition: '50% 22%',
-    imagePositionMobile: '50% 20%', gallery: [],
-    story: 'Esteban Daniel Arenas Cardona nació en Armenia, Quindío, y se trasladó a Medellín para estudiar Producción Musical. Empezó a producir con recursos sencillos en su habitación y construyó allí una identidad propia mediante el estudio y la experimentación. Su sonido fusiona Afro House, Tech House y Groove House. Entre sus lanzamientos están “Ponce”, publicado por Rituals, además de “La Aldea”, “Rápido”, “Apocalipsis”, “Tírese Muchacho”, “Fogo” y “Elewy”. SOLARIS reúne una colección creada junto a 8BATZZ.',
+    imagePositionMobile: '50% 20%', gallery: [], genres: ['Afro House', 'Tech House', 'Groove House'], hireable: true,
+    story: 'Esteban Daniel Arenas Cardona nació el 23 de febrero de 2001 en Armenia, Quindío. Empezó como DJ autodidacta en 2017 y obtuvo el segundo lugar en DJ Contest Quindío a los 16 años. Se formó en la Escuela EP Circasia y en 2018 se trasladó a Medellín para estudiar producción musical en DJ Station, donde se graduó en 2020. En 2021 fue nominado en los premios CDA como Mejor DJ Academia. Entre sus influencias están Carl Cox, Marco Carola, The Martinez Brothers y Black Coffee. Ha firmado producciones con sellos nacionales e internacionales; “Ponce” fue publicado por Rituals. También ha lanzado “La Aldea”, “Rápido”, “Apocalipsis”, “Tírese Muchacho”, “Fogo” y “Elewy”. En SOLARIS comparte una colección con 8BATZZ.',
     links: [
       { label: 'Instagram', url: 'https://www.instagram.com/estebanarenas_dj/' },
       { label: 'YouTube', url: 'https://www.youtube.com/@djestebanarenas' },
@@ -87,21 +88,46 @@ export const ARTISTS: Artist[] = [
       { label: 'SoundCloud', url: 'https://soundcloud.com/esteban-arenasdj' },
     ],
   },
+  {
+    id: 'mara', name: 'DJ Mara', location: 'Colombia',
+    bio: 'DJ y productor colombiano con más de 30 años en la escena electrónica internacional. Su repertorio recorre techno, house, trance y ambient.',
+    color: '#b84235', image: '/artists/djs/mara.png', genres: ['Techno', 'House', 'Trance', 'Ambient'], hireable: true, highlights: ['Más de 30 años de trayectoria', '50+ contrataciones'],
+    story: 'Juan Carlos, conocido artísticamente como DJ Mara, inició su recorrido tocando en fiestas y eventos locales a comienzos de los años noventa. En 1995 se trasladó a Manizales, donde se integró a la escena electrónica y desarrolló una trayectoria de más de tres décadas en clubes y festivales. Su selección musical se mueve entre techno, house, trance y ambient.',
+    links: [{ label: 'Beatport', url: 'https://www.beatport.com/artist/dj-mara/128294' }, { label: 'Traxsource', url: 'https://www.traxsource.com/artist/76692/dj-mara' }, { label: 'Instagram', url: 'https://www.instagram.com/djmaranew/' }],
+  },
+  {
+    id: 'mulan', name: 'Mulan Vibes', location: 'Miami, Estados Unidos',
+    bio: 'DJ y productora con sets de House, Tech House y Afro House, conocidos por su presencia escénica y conexión con el público.',
+    color: '#7a4568', image: '/artists/djs/mulan.png', genres: ['House', 'Tech House', 'Afro House'], hireable: true, highlights: ['22+ contrataciones'],
+    story: 'Mulan Vibes es una DJ y productora cuya propuesta combina House, Tech House y Afro House. Sus presentaciones y producciones buscan conectar con el público a través del ritmo, la energía y una selección dinámica.',
+    links: [{ label: 'Instagram', url: 'https://www.instagram.com/mulan.vibes/' }],
+  },
+  {
+    id: 'joseph-ren', name: 'Joseph Ren', location: 'Colombia',
+    bio: 'DJ y productor colombiano de música electrónica. Empezó sus estudios musicales a los 17 años y debutó como DJ en Miami con Ritmik Records.',
+    color: '#52716a', image: '/artists/djs/joseph-ren.png', hireable: true, highlights: ['12+ contrataciones'],
+    story: 'Juan José Rivera Rendón, conocido como Joseph Ren, se acercó a la música desde niño. A los 17 años comenzó sus estudios musicales con el ingeniero Maurizio Ruggiero. Un año después debutó como DJ para Ritmik Records en un club underground de Miami.',
+    links: [{ label: 'Spotify', url: 'https://open.spotify.com/artist/0TG7p0ATDDBfhBjl9EBvIb' }, { label: 'Apple Music', url: 'https://music.apple.com/co/artist/joseph-ren/1550437606' }, { label: 'Beatport', url: 'https://www.beatport.com/artist/joseph-ren/1047896' }, { label: 'Instagram', url: 'https://www.instagram.com/josephren__/' }, { label: 'YouTube', url: 'https://www.youtube.com/channel/UCGs1EkjUr4bruqvE5F_-sVw' }, { label: 'Contacto', url: 'mailto:infojosephren@gmail.com' }],
+  },
+  {
+    id: 'redbeard', name: 'Redbeard', location: 'Medellín, Colombia',
+    bio: 'DJ y productor de Tech House y Minimal Deep Tech, con lanzamientos en Kubo Records, SexAppeal Music, Kore Music y Samba.',
+    color: '#8b493b', image: '/artists/djs/redbeard.png', genres: ['Tech House', 'Minimal Deep Tech'], hireable: true,
+    story: 'Víctor Duque, conocido como Redbeard, comenzó su carrera como DJ en 2020 y luego se enfocó en producción. Su sonido combina percusión, melodías frescas, bajos potentes y texturas underground. Ha publicado música en Kubo Records, SexAppeal Music, Kore Music y Samba. Entre sus tracks están “Taste”, “Sleet”, “Montana”, “Sonoma”, “Bisonte”, “Marbella”, “KTOMA” y “High Frequency”.',
+    links: [{ label: 'Instagram', url: 'https://www.instagram.com/redbearddj/' }],
+  },
+  {
+    id: 'rizzo', name: 'Rizzo (Col)', location: 'Pereira, Colombia',
+    bio: 'DJ y productor con presentaciones en clubes y festivales de Colombia y Ecuador.',
+    color: '#c08a45', image: '/artists/djs/rizzo.png', genres: ['House', 'Tech House'], hireable: true, highlights: ['15+ contrataciones'],
+    story: 'Santiago Rizzo, conocido como Rizzo (Col), ha tocado en espacios como Baum y Baum Park en Bogotá y Medellín, Radio Studio, Octava, Palmar, El Fabuloso, Vida y Open Santa Marta. También se ha presentado en House For All y Solarium Festival, y en eventos en Ecuador. Su recorrido abarca clubes y festivales en distintas ciudades de Colombia.',
+    links: [{ label: 'Spotify', url: 'https://open.spotify.com/artist/6Ike4d8m5qsTPxm97gvEyx' }, { label: 'Instagram', url: 'https://www.instagram.com/rizzocol/' }],
+  },
   { id: 'alankoll', name: 'Alankoll', location: 'Ubicación por confirmar', bio: 'Perfil de artista pendiente de completar.', color: '#4a665c' },
   { id: 'lua-mar', name: 'Lua Mar', location: 'Medellín, CO', bio: 'Ritmos lentos, texturas de club y canciones para escuchar con la ciudad apagada.', color: '#8f382d', image: '/artists/lua-mar-editorial-v2.png', imagePosition: '60% 32%', imagePositionMobile: '58% 28%', story: 'Lua Mar trabaja el pulso como una habitación: deja espacio para que el bajo respire, para que una voz aparezca tarde y para que la noche también tenga memoria.', gallery: [] },
   { id: 'nomada-lumen', name: 'Nómada Lumen', location: 'Bogotá, CO', bio: 'Electrónica cálida y paisajes de sintetizador que encuentran luz en el ruido.', color: '#d19b48', image: '/artists/nomada-lumen-editorial-v1.png', imagePosition: '50% 44%', imagePositionMobile: '50% 38%' },
   { id: 'clara-humo', name: 'Clara y Humo', location: 'Cali, CO', bio: 'Voces cercanas, guitarras suspendidas y una forma íntima de contar la noche.', color: '#4e706b', image: '/artists/clara-humo-editorial-v1.png', imagePosition: '50% 42%', imagePositionMobile: '50% 36%' },
   { id: 'rito-verde', name: 'Rito Verde', location: 'Cartagena, CO', bio: 'Percusión tropical, bajos profundos y una pista que siempre vuelve al cuerpo.', color: '#c7622c', image: '/artists/rito-verde-editorial-v1.png', imagePosition: '50% 42%', imagePositionMobile: '50% 36%' },
-];
-
-export const DJ_PRODUCERS: Artist[] = [
-  { id: '8batzz', name: '8BATZZ', location: 'Pereira, Colombia', bio: ARTISTS[0].bio, color: '#cf4c38', image: '/artists/djs/8batzz.png', genres: ['Afro House', 'Tech House', 'Afro Melodic'], hireable: true, links: ARTISTS[0].links },
-  { id: 'esteban-arenas', name: 'Esteban Arenas', location: 'Medellín, Colombia', bio: ARTISTS[1].bio, color: '#bb9a5e', image: '/artists/djs/esteban-arenas.png', genres: ['Afro House', 'Tech House', 'Groove House'], hireable: true, links: ARTISTS[1].links },
-  { id: 'mara', name: 'Mara', location: 'Colombia', bio: 'DJ y productor colombiano con trayectoria internacional en la música electrónica.', color: '#b84235', image: '/artists/djs/mara.png', genres: [], hireable: true },
-  { id: 'mulan', name: 'Mulan', location: 'Colombia', bio: 'DJ y productora con sets de House, Tech House y Afro House.', color: '#7a4568', image: '/artists/djs/mulan.png', genres: ['House', 'Tech House', 'Afro House'], hireable: true },
-  { id: 'joseph-ren', name: 'Joseph Ren', location: 'Colombia', bio: 'DJ colombiano que crea experiencias de pista a través de la música electrónica.', color: '#52716a', image: '/artists/djs/joseph-ren.png', genres: [], hireable: true },
-  { id: 'redbeard', name: 'Redbeard', location: 'Medellín, Colombia', bio: 'DJ y productor enfocado en Tech House y Minimal Deep Tech, con lanzamientos en sellos como Kubo Records, SexAppeal Music, Kore Music y Samba.', color: '#8b493b', image: '/artists/djs/redbeard.png', genres: ['Tech House', 'Minimal Deep Tech'], hireable: true },
-  { id: 'rizzo', name: 'Rizzo', location: 'Pereira, Colombia', bio: 'DJ y productor de House y Tech House, con percusión orgánica y grooves profundos.', color: '#c08a45', image: '/artists/djs/rizzo.png', genres: ['House', 'Tech House'], hireable: true },
 ];
 
 export const RELEASES: Release[] = [
