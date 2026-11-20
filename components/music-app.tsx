@@ -340,7 +340,7 @@ function FeaturedPanel({ release, index, active, onHover }: { release: Release; 
   const releasePlaying = isPlaying && Boolean(activeTrack && release.trackIds.includes(activeTrack.id));
   return <article className={`featured-panel ${active ? 'is-active' : ''}`} onMouseEnter={onHover}>
     <div className="featured-panel-media">
-      <AlbumVinylArtwork cover={release.cover} title={release.title} size="gallery" isActive={active} isPlaying={releasePlaying} coverFit={release.id === 'solaris' ? 'contain' : 'cover'} />
+      <AlbumVinylArtwork cover={release.cover} title={release.title} size="gallery" isActive={active} isPlaying={releasePlaying} isSpinning coverFit={release.id === 'solaris' ? 'contain' : 'cover'} />
       <Link className="featured-panel-select" href={`/releases/${release.id}`} aria-label={`Abrir lanzamiento ${release.title}`}><span className="sr-only">Abrir lanzamiento {release.title}</span></Link>
       <span className="featured-panel-index">{String(index + 1).padStart(2, '0')}</span>
     </div>

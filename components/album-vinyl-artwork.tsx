@@ -6,6 +6,7 @@ type AlbumVinylArtworkProps = {
   size?: 'gallery' | 'card' | 'detail';
   isActive?: boolean;
   isPlaying?: boolean;
+  isSpinning?: boolean;
   coverFit?: 'cover' | 'contain';
   className?: string;
 };
@@ -20,6 +21,7 @@ export default function AlbumVinylArtwork({
   size = 'card',
   isActive = false,
   isPlaying = false,
+  isSpinning = false,
   coverFit = 'cover',
   className = '',
 }: AlbumVinylArtworkProps) {
@@ -28,6 +30,7 @@ export default function AlbumVinylArtwork({
     `album-vinyl-artwork--${size}`,
     isActive ? 'is-active' : '',
     isPlaying ? 'is-playing' : '',
+    isSpinning ? 'is-spinning' : '',
     coverFit === 'contain' ? 'album-vinyl-artwork--contain' : '',
     className,
   ].filter(Boolean).join(' ');
@@ -39,6 +42,7 @@ export default function AlbumVinylArtwork({
       <div className="album-vinyl-shadow" aria-hidden="true" />
       <div className="album-vinyl-disc-layer" aria-hidden="true">
         <img src="/images/music/vinyl-record.png" alt="" draggable={false} />
+        {isGallery && cover && <div className="album-vinyl-disc-face"><img src={cover} alt="" draggable={false} /><span /></div>}
       </div>
       <div className="album-vinyl-sleeve">
         {cover ? <img src={cover} alt={`Portada de ${title}`} draggable={false} /> : <div className="album-vinyl-cover-fallback" aria-label={`Portada pendiente de ${title}`} />}
